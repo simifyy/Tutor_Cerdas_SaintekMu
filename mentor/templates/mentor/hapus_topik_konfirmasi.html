@@ -1,0 +1,34 @@
+{% extends 'base.html' %} 
+
+{% block title %}Konfirmasi Hapus Topik{% endblock %}
+
+{% block content %}
+<div class="container mt-4 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card border-danger"> 
+                <div class="card-header bg-danger text-white">
+                    <h2>Konfirmasi Penghapusan Topik</h2>
+                </div>
+                <div class="card-body">
+                    <p>Apakah Anda yakin ingin menghapus topik berikut?</p>
+                    <h4 class="text-danger">{{ topic.title }}</h4> 
+                    {# Tampilkan modulnya juga #}
+                    <p class="text-muted small"> (Modul: {{ topic.module.title }}) </p> 
+                    <p class="text-danger fw-bold mt-3">
+                        PERINGATAN: Menghapus topik ini kemungkinan juga akan menghapus SEMUA pelajaran (lesson) yang ada di dalamnya secara permanen! Tindakan ini tidak dapat diurungkan.
+                    </p>
+                    <form method="post">
+                        {% csrf_token %} 
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                            {# MODIFIKASI: Tombol Batal kembali ke detail MODUL induknya #}
+                            <a href="{% url 'mentor:module_detail_mentor' module_slug=topic.module.slug %}" class="btn btn-secondary me-md-2">Batal</a>
+                            <button type="submit" class="btn btn-danger">Ya, Hapus Topik Ini</button>
+                        </div>
+                    </form>
+                </div> 
+            </div> 
+        </div> 
+    </div> 
+</div> 
+{% endblock %}

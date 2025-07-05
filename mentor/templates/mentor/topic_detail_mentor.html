@@ -1,0 +1,110 @@
+{% extends 'base.html' %} 
+
+{% block title %}Detail Topik: {{ topic.title }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4 mb-5">
+
+    {# Bagian Detail Topik & Breadcrumb (Sudah benar) #}
+    <div class="mb-4 p-4 bg-light rounded border">
+        <nav aria-label="breadcrumb">
+             <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'mentor:home' %}">Dashboard</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'mentor:materi_module_list' %}">Daftar Modul</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'mentor:module_detail_mentor' module_slug=topic.module.slug %}">{{ topic.module.title }}</a></li> 
+                <li class="breadcrumb-item active" aria-current="page">{{ topic.title }}</li> 
+            </ol>
+        </nav>
+        <hr>
+        <h1>{{ topic.title }}</h1>
+        <p class="lead">Bagian dari Modul: <strong>{{ topic.module.title }}</strong></p>
+        {% if topic.description %} <p>{{ topic.description|linebreaksbr }}</p> {% endif %}
+    </div>
+
+    {# Bagian Daftar Pelajaran (Lesson) (Sudah benar) #}
+    <div class="card mb-4"> 
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h3>Daftar Pelajaran</h3>
+            <a href="{% url 'mentor:tambah_lesson' topic_slug=topic.slug %}" class="btn btn-warning">Tambah Pelajaran Baru</a> 
+        </div>
+        <div class="card-body">
+            {% if lessons %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th scope="col">Judul Pelajaran</th>
+                                <th scope="col" class="text-center">Urutan</th>
+                                <th scope="col" class="text-center">Aksi</th> 
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for lesson in lessons %}
+                            <tr>
+                                <td>{{ lesson.title }}</td>
+                                <td class="text-center">{{ lesson.order }}</td>
+                                <td class="text-center">
+                                    {# Tombol Aksi Pelajaran (Sudah Terpisah) #}
+                                    <a href="{% url 'mentor:edit_lesson' pk=lesson.pk %}" class="btn btn-sm btn-info me-1" title="Edit Pelajaran"> Edit </a>
+                                    <a href="{% url 'mentor:hapus_lesson' pk=lesson.pk %}" class="btn btn-sm btn-danger" title="Hapus Pelajaran"> Hapus </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="alert alert-info" role="alert"> Belum ada pelajaran... </div>
+            {% endif %}
+        </div> 
+    </div> 
+
+    {# Bagian Daftar Kuis #}
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h3>Kuis untuk Topik Ini</h3>
+            <a href="{% url 'mentor:tambah_kuis' topic_slug=topic.slug %}" class="btn btn-warning">Tambah Kuis Baru</a> 
+        </div>
+        <div class="card-body">
+            {% if quizzes %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th scope="col">Judul Kuis</th>
+                                <th scope="col" class="text-center">Urutan</th>
+                                <th scope="col" class="text-center">Nilai Lulus (%)</th>
+                                <th scope="col" class="text-center">Aksi</th> 
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for quiz in quizzes %} 
+                            <tr>
+                                <td>{{ quiz.title }}</td>
+                                <td class="text-center">{{ quiz.order }}</td> 
+                                <td class="text-center">{{ quiz.pass_mark }}%</td> 
+                                {# --- MODIFIKASI: Hapus btn-group, beri margin --- #}
+                                <td class="text-center">
+                                    <a href="{% url 'mentor:list_questions' quiz_pk=quiz.pk %}" class="btn btn-sm btn-success me-1" title="Lihat Pertanyaan">Pertanyaan</a>
+                                    <a href="{% url 'mentor:edit_kuis' pk=quiz.pk %}" class="btn btn-sm btn-info me-1" title="Edit Kuis">Edit</a>
+                                    <a href="{% url 'mentor:hapus_kuis' pk=quiz.pk %}" class="btn btn-sm btn-danger" title="Hapus Kuis">Hapus</a>
+                                </td>
+                                {# --- AKHIR MODIFIKASI --- #}
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="alert alert-info" role="alert"> Belum ada kuis... </div>
+            {% endif %}
+        </div> 
+    </div> 
+
+    {# Tombol Kembali #}
+    <div class="mt-4">
+        <a href="{% url 'mentor:module_detail_mentor' module_slug=topic.module.slug %}" class="btn btn-secondary">&laquo; Kembali ke Detail Modul</a>
+    </div>
+
+</div> 
+{% endblock %}

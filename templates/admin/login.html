@@ -1,0 +1,15 @@
+{% extends "admin/login.html" %}
+{% load static %}
+
+{# Override blok CSS untuk memuat file CSS kustom kita #}
+{% block extrastyle %}
+  {{ block.super }}
+  <link rel="stylesheet" type="text/css" href="{% static 'css/admin_custom.css' %}">
+{% endblock %}
+
+{# Mengubah Judul di Header Halaman #}
+{% block branding %}
+<h1 id="site-name">
+    <a href="{% url 'admin:index' %}">Administrasi Tutor Cerdas SaintekMU</a>
+</h1>
+{% endblock %}

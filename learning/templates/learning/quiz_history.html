@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+
+{% block title %}Riwayat Kuis: {{ quiz.title }}{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="d-flex align-items-center mb-4">
+                <a href="{% url 'learning:module_detail' quiz.topic.module.slug %}" class="btn btn-outline-secondary me-3">&laquo;</a>
+                <div>
+                    <h1 class="mb-0">Riwayat Post-test</h1>
+                    <p class="lead text-muted mb-0">{{ quiz.title }}</p>
+                </div>
+            </div>
+
+            {% if pretest_attempt %}
+            <div class="card shadow-sm mb-4">
+                <div class="card-header"><h5 class="mb-0">Perbandingan Skor</h5></div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col">
+                            <p class="mb-1 text-muted">Skor Pre-test</p>
+                            <p class="h3 fw-bold">{{ pretest_attempt.score|floatformat:0 }}%</p>
+                        </div>
+                        <div class="col border-start">
+                            <p class="mb-1">Skor Post-test Terbaik</p>
+                            <p class="h3 fw-bold text-success">{{ best_posttest_score|floatformat:0 }}%</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <div class="card shadow-sm">
+                <div class="card-header"><h5 class="mb-0">Semua Percobaan</h5></div>
+                <div class="card-body">
+                    {% if attempts %}
+                        <ul class="list-group list-group-flush">
+                        {% for attempt in attempts %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    Percobaan pada: <strong>{{ attempt.completed_at|date:"d M Y, H:i" }}</strong>
+                                </div>
+                                <div>
+                                    <span class="badge bg-primary rounded-pill fs-6 me-2">Skor: {{ attempt.score|floatformat:0 }}%</span>
+                                    {% if attempt.passed %}
+                                        <span class="badge bg-success rounded-pill">Lulus</span>
+                                    {% else %}
+                                        <span class="badge bg-danger rounded-pill">Tidak Lulus</span>
+                                    {% endif %}
+                                </div>
+                            </li>
+                        {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p class="text-center text-muted">Anda belum pernah mengambil kuis ini.</p>
+                    {% endif %}
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

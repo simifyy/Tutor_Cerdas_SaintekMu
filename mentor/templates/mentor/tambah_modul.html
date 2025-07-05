@@ -1,0 +1,73 @@
+{% extends 'base.html' %} 
+
+{% block title %}
+    {# Judul dinamis berdasarkan mode #}
+    {% if is_edit_mode %}
+        Edit Modul: {{ module.title }}
+    {% else %}
+        Tambah Modul Baru
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4 mb-5">
+    {# ... (breadcrumb bisa disesuaikan juga jika mau) ... #}
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'mentor:home' %}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'mentor:materi_module_list' %}">Daftar Modul</a></li>
+            {# Judul breadcrumb dinamis #}
+            <li class="breadcrumb-item active" aria-current="page">
+                {% if is_edit_mode %}Edit Modul{% else %}Tambah Modul{% endif %}
+            </li>
+        </ol>
+    </nav>
+    <hr>
+
+    <div class="row justify-content-center">
+        <div class="col-md-8"> 
+            <div class="card">
+                <div class="card-header">
+                    {# Judul Card dinamis #}
+                    <h2>{% if is_edit_mode %}Edit Modul: "{{ module.title }}"{% else %}Tambah Modul Baru{% endif %}</h2>
+                </div>
+                <div class="card-body">
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+                        {# ... (rendering form fields tidak berubah) ... #}
+                        {% for field in form %}
+                            <div class="mb-3">
+                                {{ field.label_tag }}
+                                {# ... (logika render input/textarea/select) ... #}
+                                 {% if field.field.widget.input_type == 'textarea' %}
+                                    <textarea name="{{ field.name }}" id="{{ field.id_for_label }}" class="form-control{% if field.errors %} is-invalid{% endif %}" rows="3">{{ field.value|default_if_none:'' }}</textarea>
+                                {% elif field.field.widget.input_type == 'number' %}
+                                    <input type="number" name="{{ field.name }}" id="{{ field.id_for_label }}" value="{{ field.value|default_if_none:'' }}" class="form-control{% if field.errors %} is-invalid{% endif %}" {% if field.field.min_value is not None %}min="{{ field.field.min_value }}"{% endif %} {% if field.field.max_value is not None %}max="{{ field.field.max_value }}"{% endif %} {% if field.field.required %}required{% endif %}>
+                                {% else %}
+                                    <input type="{{ field.field.widget.input_type }}" name="{{ field.name }}" id="{{ field.id_for_label }}" value="{{ field.value|default_if_none:'' }}" class="form-control{% if field.errors %} is-invalid{% endif %}" {% if field.field.max_length %}maxlength="{{ field.field.max_length }}"{% endif %} {% if field.field.required %}required{% endif %}>
+                                {% endif %}
+                                {% if field.help_text %}
+                                    <div class="form-text">{{ field.help_text|safe }}</div>
+                                {% endif %}
+                                {% if field.errors %}
+                                    <div class="invalid-feedback">
+                                        {% for error in field.errors %} {{ error }} {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{% url 'mentor:materi_module_list' %}" class="btn btn-secondary me-md-2">Batal</a>
+                            {# Teks Tombol dinamis #}
+                            <button type="submit" class="btn btn-primary">
+                                {% if is_edit_mode %}Update Modul{% else %}Simpan Modul{% endif %}
+                            </button>
+                        </div>
+                    </form> 
+                </div> 
+            </div> 
+        </div> 
+    </div> 
+</div> 
+{% endblock %}

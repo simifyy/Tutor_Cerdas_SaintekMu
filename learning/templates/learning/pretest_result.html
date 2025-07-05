@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block title %}Hasil Pre-test: {{ attempt.quiz.title }}{% endblock %}
+
+{% block content %}
+<div class="container mt-5 mb-5"> 
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-md-10"> 
+            <div class="text-center mb-4">
+                <h1 class="fw-bold">Hasil Pre-test: {{ attempt.quiz.title }}</h1>
+            </div>
+
+            <div class="alert alert-info shadow-sm" role="alert">
+                <h3 class="alert-heading text-center fw-bold mb-3">
+                    Pre-test Selesai!
+                </h3>
+                <hr>
+                <div class="text-center my-4">
+                    <p class="mb-1 fs-5">Skor Awal Anda:</p>
+                    <p class="h2 fw-bold mb-0">{{ attempt.score|floatformat:1 }}%</p>
+                </div>
+                <hr>
+                <p class="mb-0 text-center">
+                    Terima kasih telah menyelesaikan pre-test. Sekarang Anda dapat memulai materi pembelajaran untuk topik ini.
+                </p>
+            </div>
+
+            <div class="mt-4 text-center">
+                <a href="{% url 'learning:module_detail' attempt.quiz.topic.module.slug %}" class="btn btn-primary btn-lg">
+                    Lanjutkan ke Modul &raquo;
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+{% load static %} 
+
+{% block title %}Daftar Akun Baru - Tutor Cerdas SaintekMU{% endblock %}
+
+{% block content %}
+{# Container utama dengan margin atas dan bawah #}
+<div class="container mt-5 mb-5 register-page"> 
+    <div class="row justify-content-center"> 
+        {# Kolom untuk form registrasi #}
+        <div class="col-md-9 col-lg-7 col-xl-6"> 
+            {# Card Wrapper #}
+            <div class="card shadow-sm"> 
+                <div class="card-body p-4 p-md-5"> 
+                    
+                    <h3 class="card-title text-center mb-4">Daftar Akun Baru (Siswa)</h3>
+                    <hr class="mb-4">
+
+                    {# Tampilkan error form non-field jika ada #}
+                    {% if form.non_field_errors %}
+                    <div class="alert alert-danger" role="alert">
+                        {% for error in form.non_field_errors %}
+                            <p class="mb-0">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                    
+                    {# Form Registrasi #}
+                    <form method="post" novalidate> 
+                        {% csrf_token %}
+                        
+                        {# Loop melalui semua field form #}
+                        {% for field in form %}
+                            <div class="mb-3">
+                                <label for="{{ field.id_for_label }}" class="form-label fw-bold">{{ field.label }}</label> 
+                                {{ field }} 
+                                
+                                {% if field.help_text %}
+                                    <div class="form-text text-muted mt-1"><small>{{ field.help_text }}</small></div>
+                                {% endif %}
+                                
+                                {% if field.errors %}
+                                    <div class="invalid-feedback d-block mt-1">
+                                        {% for error in field.errors %} 
+                                            <small>{{ error }}</small> 
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+
+                        {# Tombol Daftar #}
+                        <div class="d-grid my-4"> 
+                           <button type="submit" class="btn btn-warning btn-lg w-100 fw-bold">Daftar sebagai Siswa</button> 
+                        </div>
+
+                    </form> {# Akhir Form #}
+
+                    {# Link ke Halaman Login #}
+                    <div class="text-center"> 
+                        <p class="mb-0">Sudah punya akun? 
+                            <a href="{% url 'accounts:login' %}" class="fw-bold">Masuk di sini</a> 
+                        </p>
+                    </div>
+
+                </div> {# Akhir card-body #}
+
+                <div class="card-footer text-center bg-light p-3">
+                    <p class="mb-0">
+                        Ingin berkontribusi sebagai pengajar?
+                        <a href="{% url 'accounts:register_mentor' %}" class="fw-bold">Daftar sebagai Mentor</a>
+                    </p>
+                </div>
+                </div> {# Akhir card #}
+        </div> {# Akhir col #}
+    </div> {# Akhir row #}
+</div> {# Akhir container #}
+{% endblock %}

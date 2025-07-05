@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Masuk Akun - Tutor Cerdas SaintekMU{% endblock %}
+
+{% block content %}
+{# Container utama dengan margin atas dan bawah #}
+<div class="container mt-5 mb-5 login-page">
+    <div class="row justify-content-center">
+        {# Kolom untuk card login #}
+        <div class="col-md-8 col-lg-7 col-xl-6"> 
+            <div class="card shadow-sm">
+                <div class="card-body p-4 p-md-5">
+
+                    <h3 class="card-title text-center mb-4">Masuk ke Akun Anda</h3>
+
+                    {% if form.errors %}
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            Nama pengguna atau sandi Anda salah. Silakan coba lagi.
+                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endif %}
+
+                    {# Form Login dengan Layout Horizontal untuk Input #}
+                    <form method="post" action="{% url 'accounts:login' %}">
+                        {% csrf_token %}
+
+                        {# Input Nama Pengguna - Horizontal #}
+                        <div class="row mb-3 align-items-center"> 
+                            <label for="{{ form.username.id_for_label }}" class="col-sm-3 col-form-label text-sm-end fw-bold">
+                                Username
+                            </label>
+                            <div class="col-sm-9">
+                                {{ form.username }} 
+                                {% if form.username.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.username.errors %} {{ error }} {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        {# Input Sandi - Horizontal #}
+                        <div class="row mb-3 align-items-center">
+                            <label for="{{ form.password.id_for_label }}" class="col-sm-3 col-form-label text-sm-end fw-bold">
+                                Password
+                            </label>
+                            <div class="col-sm-9">
+                                {{ form.password }}
+                                {% if form.password.errors %}
+                                    <div class="invalid-feedback d-block">
+                                         {% for error in form.password.errors %} {{ error }} {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        {# Link Lupa Sandi - di bawah input sandi #}
+                        <div class="row mb-3">
+                            <div class="col-sm-9 offset-sm-3"> {# Offset agar sejajar input #}
+                                <small><a href="#">Lupa sandi?</a></small>
+                            </div>
+                        </div>
+
+                        {# == PERUBAHAN POSISI TOMBOL MASUK == #}
+                        {# Tombol diletakkan di luar struktur row/offset field di atas #}
+                        {# d-grid membuat tombol bisa w-100 (lebar penuh), efektif menempatkannya di tengah #}
+                        <div class="d-grid my-4"> {# Beri margin atas/bawah (my-4) #}
+                            <button type="submit" class="btn btn-warning btn-lg fw-bold">Masuk</button> 
+                        </div>
+                        {# == AKHIR PERUBAHAN POSISI TOMBOL == #}
+
+                        <input type="hidden" name="next" value="{{ next }}">
+                    </form> {# Akhir Form #}
+
+                    {# Link ke Halaman Daftar #}
+                    <div class="text-center"> {# mt-4 dihapus krn tombol sudah punya my-4 #}
+                        <p class="mb-0">Belum punya akun?
+                            <a href="{% url 'accounts:register' %}" class="fw-bold">Daftar di sini</a>
+                        </p>
+                    </div>
+
+                </div> {# Akhir card-body #}
+            </div> {# Akhir card #}
+        </div> {# Akhir col #}
+    </div> {# Akhir row #}
+</div> {# Akhir container #}
+{% endblock %}

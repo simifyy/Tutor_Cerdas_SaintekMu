@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Mentor Kami - Tutor Cerdas SaintekMU{% endblock %}
+
+{% block content %}
+<div class="container mt-5 mb-5 mentor-list-page"> 
+
+    <div class="text-center mb-5">
+        <h1 class="fw-bold">Mentor Kami</h1>
+        <p class="lead text-muted">Berikut adalah daftar mentor yang siap membantu Anda secara privat.</p>
+    </div>
+
+    {% if mentors %} 
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4"> 
+            {% for mentor in mentors %} 
+                <div class="col d-flex align-items-stretch"> 
+                    <div class="card h-100 shadow-sm w-100 text-center"> 
+                        
+                        <div class="py-4">
+                            {% if mentor.profile_picture %}
+                                <img src="{{ mentor.profile_picture.url }}" alt="Foto {{ mentor.get_full_name }}" class="rounded-circle" width="120" height="120" style="object-fit: cover;">
+                            {% else %}
+                                <i class="bi bi-person-circle text-muted" style="font-size: 120px;"></i>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="card-body d-flex flex-column pt-0">
+                            <h5 class="card-title mb-1"> 
+                                {{ mentor.get_full_name|default:mentor.username }}
+                            </h5>
+                            
+                            <p class="text-muted mb-2"> 
+                                <small>{{ mentor.expertise|default:"Keahlian belum diisi" }}</small>
+                            </p>
+                            
+                            <p class="card-text text-body-secondary mb-3"> 
+                                {{ mentor.bio|default:"Deskripsi singkat belum tersedia."|truncatewords:50 }} 
+                            </p>
+                            
+                            {% if mentor.phone_number %}
+                                <a href="https://wa.me/{{ mentor.phone_number }}" 
+                                   class="btn btn-success btn-sm mt-auto"
+                                   target="_blank" 
+                                   rel="noopener noreferrer">
+                                    <i class="bi bi-whatsapp me-1"></i>
+                                    Hubungi (WhatsApp)
+                                </a>
+                            {% else %}
+                                <button class="btn btn-secondary btn-sm mt-auto" disabled>Kontak Tdk Tersedia</button> 
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="col-12 text-center"> 
+            <p>Belum ada mentor yang tersedia saat ini.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

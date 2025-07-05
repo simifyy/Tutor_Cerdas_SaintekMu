@@ -1,0 +1,45 @@
+{% extends "admin/change_form.html" %}
+{% load i18n admin_urls %}
+
+{# Blok ini akan menambahkan dropdown aksi kita TEPAT DI BAWAH field terakhir #}
+{% block after_field_sets %}
+    {% if original.pk and original.status != 'APPROVED' and original.status != 'REJECTED' %}
+    <fieldset class="module aligned">
+        <h2>Ubah Status Lamaran</h2>
+        <form method="POST" action="">
+            {% csrf_token %}
+            <div class="form-row">
+                <div>
+                    <label for="id_new_status">Pilih Aksi:</label>
+                    <select name="new_status" id="id_new_status" class="form-select">
+                        <option value="">---------</option>
+                        <option value="REVIEW">Tandai Sedang Direview</option>
+                        <option value="APPROVED">Setujui Lamaran & Aktifkan Mentor</option>
+                        <option value="REJECTED">Tolak Lamaran & Nonaktifkan Akun</option>
+                    </select>
+                </div>
+            </div>
+            <div class="submit-row">
+                <input type="submit" value="Terapkan Status" name="_update_status">
+            </div>
+        </form>
+    </fieldset>
+    {% endif %}
+{% endblock %}
+
+
+{# Blok ini sekarang secara manual mendefinisikan tombol mana saja yang akan muncul #}
+{% block submit_buttons_bottom %}
+    <div class="submit-row">
+        {# Tombol "SIMPAN" standar #}
+        <input type="submit" value="{% translate 'Save' %}" class="default" name="_save">
+
+        {# TOMBOL BARU: Batal (sebagai link kembali ke daftar) #}
+        <a href="{% url 'admin:accounts_mentorapplication_changelist' %}" class="button cancel-link">Batal</a>
+
+        {# Tombol "HAPUS" standar (hanya muncul jika user punya izin) #}
+        {% if has_delete_permission %}
+             <a href="{% url opts|admin_urlname:'delete' original.pk|admin_urlquote %}" class="deletelink">{% translate "Delete" %}</a>
+        {% endif %}
+    </div>
+{% endblock %}

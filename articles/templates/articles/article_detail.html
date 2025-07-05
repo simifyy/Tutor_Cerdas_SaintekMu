@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{# Gunakan judul artikel sebagai title halaman #}
+{% block title %}{{ article.title }} - Tutor Cerdas SaintekMU{% endblock %}
+
+{% block content %}
+{# Container utama dengan margin atas dan bawah #}
+<div class="container mt-5 mb-5 article-detail-page">
+    <div class="row">
+        {# Lebar konten 10 kolom di layar large (lg), tengahkan dengan offset 1 #}
+        <div class="col-lg-10 offset-lg-1">
+
+            {# == TOMBOL KEMBALI DITAMBAHKAN DI SINI == #}
+            <div class="mb-4"> {# Beri jarak bawah untuk tombol kembali #}
+                {# Pastikan 'articles:article_list' adalah nama URL Anda untuk daftar artikel #}
+                <a href="{% url 'articles:article_list' %}" class="btn btn-sm btn-outline-secondary"> 
+                    &laquo; Kembali ke Artikel {# &laquo; adalah panah kiri « #}
+                </a>
+            </div>
+
+            <article>
+                <header class="mb-4">
+                    <h1 class="fw-bolder mb-1">{{ article.title }}</h1>
+                    <div class="text-muted fst-italic mb-2">
+                        Ditulis oleh {{ article.author.username|default:"-" }}
+                        pada {{ article.created_at|date:"d F Y H:i" }}
+                    </div>
+                </header>
+
+                {% if article.featured_image %}
+                <figure class="mb-4">
+                    <img class="img-fluid rounded" src="{{ article.featured_image.url }}" alt="{{ article.title }}" />
+                </figure>
+                {% endif %}
+
+                
+                <section class="mb-5 article-content">
+                    {{ article.content|safe }}
+                </section>
+
+            </article> {# Akhir tag article #}
+
+        </div> {# Akhir div.col-lg-10 #}
+    </div> {# Akhir div.row #}
+</div> {# Akhir div.container #}
+{% endblock %}

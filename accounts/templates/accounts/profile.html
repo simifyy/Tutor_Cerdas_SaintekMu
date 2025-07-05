@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Profil Pengguna - {{ user.username }}{% endblock %}
+
+{% block content %}
+<div class="container mt-5 mb-5 profile-page"> 
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="card shadow-sm"> 
+        <div class="card-body p-4 p-md-5">
+            <div class="row align-items-center">
+                <div class="col-md-4 text-center mb-4 mb-md-0">
+                    {% if user.profile_picture %}
+                        <img src="{{ user.profile_picture.url }}" alt="Foto Profil {{ user.get_full_name }}" class="img-fluid rounded-circle" style="width: 150px; height: 150px; object-fit: cover;">
+                    {% else %}
+                        <i class="bi bi-person-circle text-muted" style="font-size: 150px;"></i>
+                    {% endif %}
+                </div>
+                <div class="col-md-8">
+                    <h2 class="fw-bold">{{ user.get_full_name|default:user.username }}</h2>
+                    <p class="text-muted">{{ user.expertise|default:"Keahlian/minat belum diisi" }}</p>
+                    <p>{{ user.bio|default:"Bio belum diisi."|linebreaksbr }}</p>
+                </div>
+            </div>
+
+            <hr class="my-4">
+          
+            <h4 class="mb-3">Informasi Kontak & Akun</h4>
+            <dl class="row">
+                <dt class="col-sm-4">Username:</dt> 
+                <dd class="col-sm-8">{{ user.username }}</dd>
+
+                <dt class="col-sm-4">Email:</dt>
+                <dd class="col-sm-8">{{ user.email }}</dd>
+
+                <dt class="col-sm-4">Nomor Telepon (WA):</dt>
+                <dd class="col-sm-8">{{ user.phone_number|default:"-" }}</dd> 
+                
+                <dt class="col-sm-4">Tanggal Bergabung:</dt>
+                <dd class="col-sm-8">{{ user.date_joined|date:"d F Y" }}</dd> 
+            </dl>
+            
+            <hr>
+
+            <div class="d-flex justify-content-end"> 
+                <a href="{% url 'accounts:edit_profile' %}" class="btn btn-primary me-2"><i class="bi bi-pencil-square"></i> Edit Profil</a>
+                <a href="{% url 'accounts:password_change' %}" class="btn btn-outline-danger">Ubah Password</a>
+            </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

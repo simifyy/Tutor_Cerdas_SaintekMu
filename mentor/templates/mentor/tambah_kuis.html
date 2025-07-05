@@ -1,0 +1,100 @@
+{% extends 'base.html' %} {# Mewarisi dari base template Anda #}
+
+{% block title %}
+    {# Judul Halaman Dinamis #}
+    {% if is_edit_mode %}
+        Edit Kuis: {{ quiz.title }}
+    {% else %}
+        Tambah Kuis ke {{ topic.title }}
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4 mb-5">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'mentor:home' %}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'mentor:materi_module_list' %}">Daftar Modul</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'mentor:module_detail_mentor' module_slug=topic.module.slug %}">{{ topic.module.title }}</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'mentor:topic_detail_mentor' slug=topic.slug %}">{{ topic.title }}</a></li>
+             {# Judul breadcrumb dinamis #}
+            <li class="breadcrumb-item active" aria-current="page">
+                 {% if is_edit_mode %}Edit Kuis{% else %}Tambah Kuis{% endif %}
+            </li>
+        </ol>
+    </nav>
+    <hr>
+
+    <div class="row justify-content-center">
+        <div class="col-md-8"> {# Batasi lebar form #}
+            <div class="card">
+                <div class="card-header">
+                     {# Judul Card Dinamis #}
+                    <h2>{% if is_edit_mode %}Edit Kuis: "{{ quiz.title }}"{% else %}Tambah Kuis Baru untuk Topik: "{{ topic.title }}"{% endif %}</h2>
+                </div>
+                <div class="card-body">
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+
+                        {% if form.non_field_errors %}
+                            <div class="alert alert-danger" role="alert">
+                                {% for error in form.non_field_errors %} {{ error }} {% endfor %}
+                            </div>
+                        {% endif %}
+
+                        {# Loop melalui field form QuizForm #}
+                        {% for field in form %}
+                            <div class="mb-3">
+                                {{ field.label_tag }}
+
+                                {# Render field input/textarea/number #}
+                                {% if field.field.widget.input_type == 'textarea' %}
+                                    <textarea name="{{ field.name }}" id="{{ field.id_for_label }}" class="form-control{% if field.errors %} is-invalid{% endif %}" rows="3">{{ field.value|default_if_none:'' }}</textarea>
+                                {% elif field.field.widget.input_type == 'number' %}
+                                     <input type="number"
+                                            name="{{ field.name }}"
+                                            id="{{ field.id_for_label }}"
+                                            value="{{ field.value|default_if_none:'' }}"
+                                            class="form-control{% if field.errors %} is-invalid{% endif %}"
+                                            {% if field.field.widget.attrs.min is not None %}min="{{ field.field.widget.attrs.min }}"{% endif %}
+                                            {% if field.field.widget.attrs.max is not None %}max="{{ field.field.widget.attrs.max }}"{% endif %}
+                                            {% if field.field.widget.attrs.step is not None %}step="{{ field.field.widget.attrs.step }}"{% endif %}
+                                            {% if field.field.required %}required{% endif %}>
+                                {% else %} {# Untuk field title (tipe text) #}
+                                     <input type="{{ field.field.widget.input_type }}"
+                                            name="{{ field.name }}"
+                                            id="{{ field.id_for_label }}"
+                                            value="{{ field.value|default_if_none:'' }}"
+                                            class="form-control{% if field.errors %} is-invalid{% endif %}"
+                                            {% if field.field.max_length %}maxlength="{{ field.field.max_length }}"{% endif %}
+                                            {% if field.field.required %}required{% endif %}>
+                                {% endif %}
+
+                                {% if field.help_text %}
+                                    <div class="form-text">{{ field.help_text|safe }}</div>
+                                {% endif %}
+                                {% if field.errors %}
+                                    <div class="invalid-feedback">
+                                        {% for error in field.errors %} {{ error }} {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            {# Tombol Batal, kembali ke halaman detail topik induknya #}
+                            <a href="{% url 'mentor:topic_detail_mentor' slug=topic.slug %}" class="btn btn-secondary me-md-2">Batal</a>
+                             {# Teks Tombol Dinamis #}
+                            <button type="submit" class="btn btn-primary">
+                                {% if is_edit_mode %}Update Kuis{% else %}Simpan Kuis{% endif %}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{# Block extra_js tidak diperlukan untuk form ini #}

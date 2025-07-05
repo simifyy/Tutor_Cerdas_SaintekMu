@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% load static %} {# Muat static jika perlu #}
+
+{% block title %}Hasil Kuis: {{ attempt.quiz.title }} - Tutor Cerdas SaintekMU{% endblock %}
+
+{% block content %}
+{# Container utama dengan margin atas dan bawah #}
+<div class="container mt-5 mb-5 quiz-result-page"> 
+    <div class="row justify-content-center">
+        {# Batasi lebar konten hasil kuis #}
+        <div class="col-lg-8 col-md-10"> 
+
+            {# Judul Halaman - Rata Tengah #}
+            <div class="text-center mb-4">
+                <h1 class="fw-bold">Hasil Post-test: {{ attempt.quiz.title }}</h1>
+            </div>
+
+            {# Alert Box untuk Hasil Utama #}
+            <div class="alert {% if attempt.passed %}alert-success{% else %}alert-danger{% endif %} shadow-sm" role="alert">
+                <h3 class="alert-heading text-center fw-bold mb-3">
+                    {% if attempt.passed %}
+                        <i class="bi bi-check-circle-fill me-2"></i>
+                        Selamat, Anda Lulus!
+                    {% else %}
+                        <i class="bi bi-x-octagon-fill me-2"></i>
+                        Maaf, Anda Belum Lulus
+                    {% endif %}
+                </h3>
+                <hr>
+                <div class="row text-center my-4">
+                    <div class="col">
+                         <p class="mb-1 fs-5">Skor Anda:</p>
+                         <p class="h2 fw-bold mb-0">{{ attempt.score|floatformat:1 }}%</p>
+                    </div>
+                    <div class="col">
+                        <p class="mb-1 fs-5">Minimum Kelulusan:</p>
+                        <p class="h2 fw-bold mb-0">{{ attempt.quiz.pass_mark }}%</p>
+                    </div>
+                </div>
+                <hr>
+                <p class="mb-0 text-center text-muted">
+                    <small>Kuis diselesaikan pada {{ attempt.completed_at|date:"d F Y H:i" }}</small>
+                </p>
+            </div>
+
+            {% if pretest_attempt %}
+            <div class="card shadow-sm mt-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-graph-up-arrow me-2"></i>Perbandingan Hasil</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col">
+                            <p class="mb-1 text-muted">Skor Pre-test</p>
+                            <p class="h3 fw-bold">{{ pretest_attempt.score|floatformat:1 }}%</p>
+                        </div>
+                        <div class="col border-start">
+                            <p class="mb-1">Skor Post-test</p>
+                            <p class="h3 fw-bold text-success">{{ attempt.score|floatformat:1 }}%</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            {# Tombol/link navigasi - Rata Tengah #}
+            <div class="mt-4 text-center">
+                {# Link kembali ke detail modul #}
+                <a href="{% url 'learning:module_detail' attempt.quiz.topic.module.slug %}" class="btn btn-secondary me-2">
+                    &laquo; Kembali ke Modul
+                </a>
+                
+                {# Tombol untuk mencoba lagi (logika opsional) #}
+                {# {% if not attempt.passed %} ... {% endif %} #}
+            </div>
+
+        </div> {# Akhir col #}
+    </div> {# Akhir row #}
+</div> {# Akhir container #}
+{% endblock %}

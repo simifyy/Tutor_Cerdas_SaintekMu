@@ -1,0 +1,170 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Analisis Aktivitas Pengguna{% endblock %}
+
+{% block content %}
+<div class="container mt-4 mb-5">
+    <h1 class="mb-4">Analisis Aktivitas Pengguna</h1>
+    <p>Ringkasan data dan aktivitas terbaru di platform.</p>
+    <hr>
+
+    {# --- BAGIAN KARTU RINGKASAN --- #}
+    <div class="row g-3 mb-4"> {# g-3 untuk gutter/jarak antar kolom #}
+        <div class="col-md col-6"> {# col-md agar di layar medium jadi 5 kolom, col-6 agar di layar kecil jadi 2 kolom #}
+            <div class="card text-center h-100">
+                <div class="card-body">
+                    <h5 class="card-title display-6">{{ student_count|default:0 }}</h5>
+                    <p class="card-text text-muted"><i class="fas fa-users me-1"></i> Siswa</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md col-6">
+            <div class="card text-center h-100">
+                <div class="card-body">
+                    <h5 class="card-title display-6">{{ module_count|default:0 }}</h5>
+                    <p class="card-text text-muted"><i class="fas fa-cubes me-1"></i> Modul</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md col-6">
+             <div class="card text-center h-100">
+                <div class="card-body">
+                    <h5 class="card-title display-6">{{ topic_count|default:0 }}</h5>
+                    <p class="card-text text-muted"><i class="fas fa-cube me-1"></i> Topik</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md col-6">
+             <div class="card text-center h-100">
+                <div class="card-body">
+                    <h5 class="card-title display-6">{{ lesson_count|default:0 }}</h5>
+                    <p class="card-text text-muted"><i class="fas fa-book-open me-1"></i> Pelajaran</p>
+                </div>
+            </div>
+        </div>
+         <div class="col-md col-12"> {# Kolom terakhir bisa full width di layar kecil #}
+             <div class="card text-center h-100">
+                <div class="card-body">
+                    <h5 class="card-title display-6">{{ quiz_count|default:0 }}</h5>
+                    <p class="card-text text-muted"><i class="fas fa-question-circle me-1"></i> Kuis</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# --- BAGIAN GRAFIK AKTIVITAS --- #}
+    <div class="card mb-4">
+        <div class="card-header">
+            <i class="fas fa-chart-line me-1"></i> Aktivitas 7 Hari Terakhir
+        </div>
+        <div class="card-body">
+            {# Canvas adalah tempat grafik akan digambar oleh Chart.js #}
+            <canvas id="activityChart" width="400" height="150"></canvas> 
+        </div>
+    </div>
+
+    {# --- BAGIAN DAFTAR PENGGUNA (Seperti sebelumnya) --- #}
+     <div class="card">
+        <div class="card-header">
+             <i class="fas fa-users me-1"></i> Daftar Pengguna (Siswa)
+        </div>
+        <div class="card-body">
+            {% if students %}
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th scope="col">Username</th>
+                                <th scope="col">Nama Lengkap</th>
+                                <th scope="col">Email</th>
+                                <th scope="col">Tanggal Bergabung</th>
+                                <th scope="col">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for student in students %}
+                            <tr>
+                                <td>{{ student.username }}</td>
+                                <td>{{ student.get_full_name|default:"-" }}</td>
+                                <td>{{ student.email|default:"-" }}</td>
+                                <td>{{ student.date_joined|date:"d M Y" }}</td>
+                                <td>
+                                    <a href="{% url 'mentor:analisis_user_detail' user_pk=student.pk %}" class="btn btn-sm btn-primary">Lihat Aktivitas</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="alert alert-info" role="alert">
+                    Belum ada pengguna (role USER) yang terdaftar.
+                </div>
+            {% endif %}
+         </div>
+     </div>
+
+</div> {# Akhir container #}
+{% endblock %}
+
+
+{% block extra_js %}
+    {{ block.super }}
+    {# 1. Sertakan Library Chart.js (via CDN) #}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script> {# Versi bisa disesuaikan #}
+
+    {# 2. Ambil data dari context Django dan buat grafik #}
+    {# Gunakan json_script untuk keamanan saat memasukkan data ke JavaScript #}
+    {{ chart_labels|json_script:"chart-labels" }}
+    {{ chart_lessons_data|json_script:"chart-lessons-data" }}
+    {{ chart_quizzes_data|json_script:"chart-quizzes-data" }}
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Ambil data dari elemen script
+            const labels = JSON.parse(document.getElementById('chart-labels').textContent);
+            const lessonData = JSON.parse(document.getElementById('chart-lessons-data').textContent);
+            const quizData = JSON.parse(document.getElementById('chart-quizzes-data').textContent);
+
+            // Dapatkan konteks canvas
+            const ctx = document.getElementById('activityChart');
+
+            // Buat Grafik jika elemen canvas ditemukan
+            if (ctx) {
+                 const activityChart = new Chart(ctx, {
+                    type: 'line', // Tipe grafik: garis
+                    data: {
+                        labels: labels, // Label sumbu X (tanggal)
+                        datasets: [{
+                            label: 'Pelajaran Selesai', // Nama dataset 1
+                            data: lessonData, // Data jumlah pelajaran per hari
+                            borderColor: 'rgb(75, 192, 192)', // Warna garis
+                            tension: 0.1 // Kelengkungan garis
+                        }, {
+                            label: 'Kuis Dikerjakan', // Nama dataset 2
+                            data: quizData, // Data jumlah kuis per hari
+                            borderColor: 'rgb(255, 99, 132)', // Warna garis
+                            tension: 0.1
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: { // Pengaturan sumbu Y
+                                beginAtZero: true, // Mulai dari 0
+                                ticks: { // Pengaturan angka di sumbu Y
+                                    precision: 0 // Tampilkan angka bulat saja
+                                }
+                            }
+                        },
+                        responsive: true, // Buat grafik responsif
+                        maintainAspectRatio: true // Pertahankan rasio aspek default
+                    }
+                });
+            } else {
+                console.error("Canvas element 'activityChart' not found.");
+            }
+        });
+    </script>
+
+{% endblock %}

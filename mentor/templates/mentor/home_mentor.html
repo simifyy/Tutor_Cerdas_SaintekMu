@@ -1,0 +1,147 @@
+{% extends 'base.html' %} 
+{% load static %} 
+{% load humanize %} 
+
+{% block title %}Dashboard Mentor - Tutor Cerdas SaintekMU{% endblock %}
+
+{% block content %}
+{# Container utama dengan margin & kelas spesifik #}
+<div class="container mt-5 mb-5 mentor-dashboard"> 
+    {# Judul Halaman - Rata Tengah #}
+    <div class="text-center mb-4">
+        <h1 class="fw-bold">Dashboard Mentor</h1>
+        <p class="lead text-muted">Selamat datang kembali, {{ request.user.get_full_name|default:request.user.username }}!</p>
+    </div>
+    <hr class="mb-5">
+
+    {# --- Kartu Ringkasan (Tanpa Border Warna & Tombol Kelola) --- #}
+    <div class="row g-3 mb-5"> {# Beri jarak bawah lebih besar setelah ringkasan #}
+        {# Kartu Siswa #}
+        <div class="col-lg col-md-4 col-6"> 
+            {# HAPUS kelas border-start-* dari sini #}
+            <div class="card text-center h-100 shadow-sm summary-card"> 
+                <div class="card-body p-3 p-md-4"> 
+                    <h5 class="card-title display-5 fw-bold mb-3">{{ student_count|default:"0" }}</h5> 
+                    <p class="card-text text-muted"><i class="fas fa-users fa-fw me-1"></i> Siswa</p> 
+                </div>
+            </div>
+        </div>
+        {# Kartu Modul #}
+        <div class="col-lg col-md-4 col-6">
+            <div class="card text-center h-100 shadow-sm summary-card">
+                <div class="card-body p-3 p-md-4">
+                    <h5 class="card-title display-5 fw-bold mb-3">{{ module_count|default:"0" }}</h5>
+                    <p class="card-text text-muted"><i class="fas fa-cubes fa-fw me-1"></i> Modul</p> 
+                </div>
+            </div>
+        </div>
+        {# Kartu Topik #}
+        <div class="col-lg col-md-4 col-6">
+             <div class="card text-center h-100 shadow-sm summary-card">
+                <div class="card-body p-3 p-md-4">
+                    <h5 class="card-title display-5 fw-bold mb-3">{{ topic_count|default:"0" }}</h5>
+                    <p class="card-text text-muted"><i class="fas fa-cube fa-fw me-1"></i> Topik</p> 
+                </div>
+            </div>
+        </div>
+        {# Kartu Pelajaran #}
+        <div class="col-lg col-md-6 col-6"> 
+             <div class="card text-center h-100 shadow-sm summary-card">
+                <div class="card-body p-3 p-md-4">
+                    <h5 class="card-title display-5 fw-bold mb-3">{{ lesson_count|default:"0" }}</h5>
+                    <p class="card-text text-muted"><i class="fas fa-book-open fa-fw me-1"></i> Pelajaran</p> 
+                </div>
+            </div>
+        </div>
+         {# Kartu Kuis #}
+         <div class="col-lg col-md-6 col-12"> 
+             <div class="card text-center h-100 shadow-sm summary-card">
+                <div class="card-body p-3 p-md-4">
+                    <h5 class="card-title display-5 fw-bold mb-3">{{ quiz_count|default:"0" }}</h5>
+                    <p class="card-text text-muted"><i class="fas fa-question-circle fa-fw me-1"></i> Kuis</p> 
+                </div>
+            </div>
+        </div>
+    </div> 
+    {# --- AKHIR Kartu Ringkasan --- #}
+
+
+    {# --- Baris untuk Aktivitas dan Materi (Tetap seperti perbaikan terakhir) --- #}
+    <div class="row g-4">
+        {# Kolom Aktivitas Pengguna Terbaru #}
+        <div class="col-lg-6 mb-4">
+            <div class="card h-100 shadow-sm activity-card"> 
+                <div class="card-header bg-light fw-medium"> 
+                    <i class="fas fa-tasks me-1 text-primary"></i> Progres Pelajaran Terbaru 
+                </div>
+                <div class="card-body p-3" style="max-height: 350px; overflow-y: auto;"> 
+                    {% if recent_activity %}
+                        <ul class="list-group list-group-flush">
+                            {% for progress in recent_activity %} 
+                                <li class="list-group-item small lh-sm px-0 py-2"> 
+                                    <div class="d-flex justify-content-between">
+                                        <strong>
+                                            <a href="#" class="text-decoration-none themed-link">
+                                                {{ progress.user.get_full_name|default:progress.user.username }}
+                                            </a>
+                                        </strong>
+                                        <span class="text-muted" title="{{ progress.completed_at|date:"d M Y, H:i" }}">
+                                            {{ progress.completed_at|timesince }} yg lalu
+                                        </span>
+                                    </div>
+                                    <div class="text-muted" style="font-size: 0.85em; margin-left: 5px;"> 
+                                        Selesai: 
+                                        {% if progress.lesson %}
+                                            '{{ progress.lesson.title|truncatechars:35 }}'
+                                            {% if progress.lesson.topic %}
+                                                (Topik: {{ progress.lesson.topic.title|truncatechars:25 }})
+                                            {% endif %}
+                                        {% else %}
+                                            (Pelajaran tidak tersedia)
+                                        {% endif %}
+                                    </div>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p class="text-muted fst-italic text-center mt-3">Belum ada progres pelajaran terbaru.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        {# Kolom Materi Pelajaran Terbaru #}
+        <div class="col-lg-6 mb-4">
+            <div class="card h-100 shadow-sm activity-card">
+                <div class="card-header bg-light fw-medium"> 
+                    <i class="fas fa-book-medical me-1 text-success"></i> Materi Pelajaran Baru
+                </div>
+                <div class="card-body p-3" style="max-height: 350px; overflow-y: auto;">
+                    {% if recent_materials %}
+                        <ul class="list-group list-group-flush">
+                            {% for lesson in recent_materials %}
+                                <li class="list-group-item small lh-sm px-0 py-2"> 
+                                    <strong>
+                                        <a href="#" class="text-decoration-none themed-link"> {# Ganti URL ke edit materi? #}
+                                            {{ lesson.title }}
+                                        </a>
+                                    </strong>
+                                    {% if lesson.topic %}
+                                        <span class="badge bg-secondary ms-2">{{ lesson.topic.title|truncatechars:30 }}</span>
+                                    {% endif %}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p class="text-muted fst-italic text-center mt-3">Belum ada materi pelajaran baru.</p>
+                    {% endif %}
+                </div>
+                 <div class="card-footer bg-white text-center">
+                    <a href="{% url 'mentor:materi_module_list' %}" class="btn btn-sm btn-outline-primary">Kelola Semua Materi</a>
+                </div>
+            </div>
+        </div>
+    </div> {# End row aktivitas & materi #}
+
+</div> {# End container #}
+{% endblock %}

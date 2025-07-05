@@ -1,0 +1,147 @@
+{% extends 'base.html' %}
+{% load static %} {# Muat static jika perlu #}
+
+{% block title %}{{ lesson.title }} - {{ lesson.topic.module.title }}{% endblock %}
+
+{% block content %}
+{# Container utama dengan margin atas dan bawah #}
+<div class="container mt-5 mb-5 lesson-detail-page"> 
+    <div class="row justify-content-center">
+        {# Batasi lebar konten utama agar mudah dibaca #}
+        <div class="col-lg-9 col-xl-8"> {# Sedikit lebih lebar dari artikel biasa? Sesuaikan jika perlu #}
+
+            {# 1. Breadcrumb Navigasi (Kode asli Anda, tidak diubah) #}
+            <nav aria-label="breadcrumb" style="--bs-breadcrumb-divider: '>';" class="mb-4">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'learning:module_list' %}">Modul</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'learning:module_detail' lesson.topic.module.slug %}">{{ lesson.topic.module.title }}</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{ lesson.title }}</li>
+                </ol>
+            </nav>
+
+            {# 2. Konten Pelajaran #}
+            <article class="mt-4">
+                {# Header Pelajaran (Kode asli Anda, tidak diubah) #}
+                <header class="mb-4 border-bottom pb-3">
+                    <h1 class="fw-bolder mb-2">{{ lesson.title }}</h1>
+                    <p class="text-muted mb-0">
+                        <small>
+                            Topik: {{ lesson.topic.title }} | Modul: {{ lesson.topic.module.title }}
+                        </small>
+                    </p>
+                </header>
+
+                {# Cek Akses (Kode asli Anda, tidak diubah) #}
+                {% if not can_access %}
+                    <div class="alert alert-warning">
+                        Anda harus menyelesaikan pelajaran sebelumnya dalam topik ini terlebih dahulu untuk mengakses konten ini.
+                    </div>
+                {% else %}
+                    {# Konten Pelajaran (Kode asli Anda, tidak diubah) #}
+                    <section class="article-content mb-5"> 
+                        {{ lesson.content|safe }} {# Gunakan |safe jika konten HTML #}
+                    </section>
+
+                    {# Tombol Selesai / Lanjut (Bagian ini diperbarui) #}
+                    <div class="mt-4 pt-4 border-top d-flex justify-content-between align-items-center">
+                        <div> {# Sisi Kiri: Status atau Timer #}
+                             {% if is_completed %} 
+                                 <span class="badge bg-success fs-6 p-2 rounded-pill">
+                                     <i class="bi bi-check-circle-fill me-1"></i>
+                                     Pelajaran Selesai
+                                 </span>
+                             {% else %}
+                                <div id="timer-display" class="alert alert-info py-2 px-3 d-inline-block">
+                                    <i class="bi bi-clock-history"></i> Sisa waktu belajar: <strong id="timer-countdown"></strong>
+                                </div>
+                                <div id="timer-complete-message" class="alert alert-success py-2 px-3 d-none">
+                                    <i class="bi bi-check-lg"></i> Waktu belajar minimum terpenuhi!
+                                </div>
+                             {% endif %}
+                        </div>
+                        <div> {# Sisi Kanan: Tombol Aksi #}
+                            {% if is_completed %} 
+                                {# Tombol Lanjut jika pelajaran sudah selesai (Kode asli Anda, tidak diubah) #}
+                                {% if next_lesson %}
+                                    <a href="{% url 'learning:lesson_detail' next_lesson.topic.module.slug next_lesson.topic.slug next_lesson.slug %}" class="btn btn-warning btn-lg">
+                                        Pelajaran Berikutnya &raquo;
+                                    </a>
+                                {% else %}
+                                     {% if lesson.topic.quiz %}
+                                         {% if lesson.topic.quiz.id not in passed_quiz_ids %} 
+                                             <a href="#" class="btn btn-info">
+                                                 Lanjut ke Kuis Topik
+                                             </a>
+                                         {% else %}
+                                             <a href="{% url 'learning:module_detail' lesson.topic.module.slug %}" class="btn btn-outline-secondary">Kembali ke Topik</a>
+                                         {% endif %}
+                                     {% else %}
+                                        <a href="{% url 'learning:module_detail' lesson.topic.module.slug %}" class="btn btn-outline-secondary">Kembali ke Topik</a>
+                                     {% endif %}
+                                {% endif %}
+                            {% else %} 
+                                {# Tombol Tandai Selesai #}
+                                <form action="{% url 'learning:mark_lesson_complete' lesson.slug %}" method="post" class="d-inline">
+                                    {% csrf_token %}
+                                    <button id="complete-button" type="submit" class="btn btn-success" disabled>Tandai Selesai & Lanjutkan</button>
+                                </form>
+                            {% endif %} 
+                        </div>
+                    </div> {# Akhir div tombol #}
+                {% endif %} {# Akhir if can_access #}
+            </article>
+
+            <hr class="my-4">
+
+            {# Link kembali ke detail modul (Kode asli Anda, tidak diubah) #}
+            <div class="text-center">
+                <a href="{% url 'learning:module_detail' lesson.topic.module.slug %}" class="btn btn-outline-secondary">&laquo; Kembali ke Detail Modul</a>
+            </div>
+
+        </div> {# Akhir col #}
+    </div> {# Akhir row #}
+</div> {# Akhir container #}
+{% endblock %}
+
+
+{# ================== PERUBAHAN 3: BLOK JAVASCRIPT UNTUK TIMER ================== #}
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Jalankan skrip hanya jika elemen 'complete-button' ada di halaman
+    const completeButton = document.getElementById('complete-button');
+    if (completeButton) {
+        const timerDisplay = document.getElementById('timer-countdown');
+        const timerContainer = document.getElementById('timer-display');
+        const timerCompleteMessage = document.getElementById('timer-complete-message');
+        
+        // Ambil durasi dari model (dalam menit) dan ubah ke detik
+        // Pastikan variabel 'lesson' tersedia dari context view
+        let durationInSeconds = {{ lesson.minimum_reading_time|default:1 }} * 60;
+
+        const timer = setInterval(function() {
+            // Hitung menit dan detik
+            const minutes = Math.floor(durationInSeconds / 60);
+            let seconds = durationInSeconds % 60;
+
+            // Tambahkan nol di depan jika detik < 10 untuk format MM:SS
+            seconds = seconds < 10 ? '0' + seconds : seconds;
+
+            // Tampilkan waktu di elemen countdown
+            timerDisplay.textContent = minutes + ":" + seconds;
+
+            // Kurangi durasi setiap detik
+            durationInSeconds--;
+
+            // Jika waktu sudah habis
+            if (durationInSeconds < 0) {
+                clearInterval(timer); // Hentikan interval
+                completeButton.disabled = false; // Aktifkan tombol 'Tandai Selesai'
+                timerContainer.classList.add('d-none'); // Sembunyikan tampilan timer
+                timerCompleteMessage.classList.remove('d-none'); // Tampilkan pesan selesai
+            }
+        }, 1000); // Update setiap 1 detik
+    }
+});
+</script>
+{% endblock %}

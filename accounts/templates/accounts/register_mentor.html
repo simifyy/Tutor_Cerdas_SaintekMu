@@ -1,0 +1,173 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Daftar Sebagai Pengajar - Tutor Cerdas SaintekMU{% endblock %}
+
+{% block content %}
+<div class="container my-5 register-mentor-page">
+    <div class="row justify-content-center">
+        <div class="col-lg-9">
+            <div class="card shadow-lg border-0 rounded-lg">
+                <div class="card-header bg-warning text-dark">
+                    <div class="text-center py-3">
+                        <i class="bi bi-person-video3" style="font-size: 3rem;"></i>
+                        <h3 class="mt-2">Formulir Pendaftaran Pengajar</h3>
+                        <p class="mb-0">Lengkapi data di bawah ini untuk bergabung bersama kami.</p>
+                    </div>
+                </div>
+                <div class="card-body p-4 p-md-5">
+                    
+                    <form method="POST" enctype="multipart/form-data" novalidate>
+                        {% csrf_token %}
+
+                        {% if user_form.non_field_errors or application_form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            {% for error in user_form.non_field_errors %}<p class="mb-0">{{ error }}</p>{% endfor %}
+                            {% for error in application_form.non_field_errors %}<p class="mb-0">{{ error }}</p>{% endfor %}
+                        </div>
+                        {% endif %}
+
+                        <div class="p-3 mb-4 border rounded bg-light">
+                            <h5 class="fw-bold"><i class="bi bi-person-circle me-2"></i>Informasi Akun Login</h5>
+                            <p class="text-muted small">Informasi ini akan Anda gunakan untuk masuk ke platform.</p>
+                            <hr>
+                            {% for field in user_form %}
+                            <div class="mb-3">
+                                <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                                {{ field }}
+                                {% for error in field.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+                            </div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="p-3 mb-4 border rounded">
+                            <h5 class="fw-bold"><i class="bi bi-person-lines-fill me-2"></i>A. Informasi Pribadi & Profil</h5>
+                            <hr>
+                            <div class="mb-3">
+                                <label for="{{ application_form.full_name.id_for_label }}" class="form-label">{{ application_form.full_name.label }}</label>
+                                {{ application_form.full_name }}
+                                {% for error in application_form.full_name.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="{{ application_form.gender.id_for_label }}" class="form-label">{{ application_form.gender.label }}</label>
+                                    {{ application_form.gender }}
+                                    {% for error in application_form.gender.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="{{ application_form.date_of_birth.id_for_label }}" class="form-label">{{ application_form.date_of_birth.label }}</label>
+                                    {{ application_form.date_of_birth }}
+                                    {% for error in application_form.date_of_birth.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="{{ application_form.whatsapp_number.id_for_label }}" class="form-label">{{ application_form.whatsapp_number.label }}</label>
+                                {{ application_form.whatsapp_number }}
+                                {% for error in application_form.whatsapp_number.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+                            </div>
+                            <div class="mb-3">
+                                <label for="{{ application_form.address.id_for_label }}" class="form-label">{{ application_form.address.label }}</label>
+                                {{ application_form.address }}
+                                {% for error in application_form.address.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+                            </div>
+                            <div class="mb-3">
+                                <label for="{{ application_form.profile_picture.id_for_label }}" class="form-label">{{ application_form.profile_picture.label }}</label>
+                                {{ application_form.profile_picture }}
+                                {% for error in application_form.profile_picture.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+                            </div>
+                            <div class="mb-3">
+                                <label for="{{ application_form.expertise.id_for_label }}" class="form-label">{{ application_form.expertise.label }}</label>
+                                {{ application_form.expertise }}
+                                {% if application_form.expertise.help_text %}<small class="form-text text-muted">{{ application_form.expertise.help_text }}</small>{% endif %}
+                                {% for error in application_form.expertise.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+                            </div>
+                            <div class="mb-3">
+                                <label for="{{ application_form.bio.id_for_label }}" class="form-label">{{ application_form.bio.label }}</label>
+                                {{ application_form.bio }}
+                                {% if application_form.bio.help_text %}<small class="form-text text-muted">{{ application_form.bio.help_text }}</small>{% endif %}
+                                {% for error in application_form.bio.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+                            </div>
+                        </div>
+
+                        <div class="p-3 mb-4 border rounded">
+                             <h5 class="fw-bold"><i class="bi bi-mortarboard-fill me-2"></i>B. Latar Belakang Pendidikan</h5>
+                            <hr>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="{{ application_form.education_level.id_for_label }}" class="form-label">{{ application_form.education_level.label }}</label>
+                                    {{ application_form.education_level }}
+                                    {% for error in application_form.education_level.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="{{ application_form.graduation_year.id_for_label }}" class="form-label">{{ application_form.graduation_year.label }}</label>
+                                    {{ application_form.graduation_year }}
+                                    {% for error in application_form.graduation_year.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="{{ application_form.institution_name.id_for_label }}" class="form-label">{{ application_form.institution_name.label }}</label>
+                                {{ application_form.institution_name }}
+                                {% for error in application_form.institution_name.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+                            </div>
+                            <div class="mb-3">
+                                <label for="{{ application_form.major.id_for_label }}" class="form-label">{{ application_form.major.label }}</label>
+                                {{ application_form.major }}
+                                {% for error in application_form.major.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+                            </div>
+                        </div>
+                        
+                        <div class="p-3 mb-4 border rounded">
+                             <h5 class="fw-bold"><i class="bi bi-file-earmark-arrow-up-fill me-2"></i>C. Dokumen & Portofolio</h5>
+                            <hr>
+                            <div class="mb-3">
+                                <label for="{{ application_form.cv.id_for_label }}" class="form-label">{{ application_form.cv.label }}</label>
+                                {{ application_form.cv }}
+                                {% for error in application_form.cv.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+                            </div>
+                            <div class="mb-3">
+                                <label for="{{ application_form.portfolio_pdf.id_for_label }}" class="form-label">{{ application_form.portfolio_pdf.label }}</label>
+                                {{ application_form.portfolio_pdf }}
+                                {% for error in application_form.portfolio_pdf.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+                            </div>
+                            <div class="mb-3">
+                                <label for="{{ application_form.github_link.id_for_label }}" class="form-label">{{ application_form.github_link.label }}</label>
+                                {{ application_form.github_link }}
+                                {% for error in application_form.github_link.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+                            </div>
+                            <div class="mb-3">
+                                <label for="{{ application_form.certificate.id_for_label }}" class="form-label">{{ application_form.certificate.label }}</label>
+                                {{ application_form.certificate }}
+                                {% for error in application_form.certificate.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+                            </div>
+                             <div class="mb-3">
+                                <label for="{{ application_form.intro_video.id_for_label }}" class="form-label">{{ application_form.intro_video.label }}</label>
+                                {{ application_form.intro_video }}
+                                {% if application_form.intro_video.help_text %}<small class="form-text text-muted">{{ application_form.intro_video.help_text }}</small>{% endif %}
+                                {% for error in application_form.intro_video.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+                            </div>
+                        </div>
+                        
+                        <div class="p-3 mb-4 border rounded">
+                             <h5 class="fw-bold"><i class="bi bi-patch-check-fill me-2"></i>D. Pernyataan</h5>
+                            <hr>
+                            <div class="form-check">
+                                {{ application_form.declaration }}
+                                <label class="form-check-label" for="{{ application_form.declaration.id_for_label }}">
+                                    {{ application_form.declaration.label }}
+                                </label>
+                                {% for error in application_form.declaration.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+                            </div>
+                        </div>
+
+                        <div class="d-grid mt-4">
+                            <button type="submit" class="btn btn-primary btn-lg fw-bold">
+                                <i class="bi bi-send-check me-2"></i>Kirim Lamaran Saya
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

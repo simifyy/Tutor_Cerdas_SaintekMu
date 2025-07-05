@@ -1,0 +1,21 @@
+{% extends "admin/change_form.html" %}
+{% load i18n admin_urls %}
+
+{% block object-tools-items %}
+    {{ block.super }}
+{% endblock %}
+
+{# Blok ini akan menimpa bagian tombol di bawah form #}
+{% block submit_buttons_bottom %}
+    {# Memanggil tombol-tombol asli seperti "Save", "Save and continue", dll. #}
+    {{ block.super }}
+
+    {# Menambahkan tombol-tombol kustom kita #}
+    <div class="submit-row">
+        <input type="submit" value="Tandai Sedang Direview" name="_set_review_status" class="button" style="background-color: #17a2b8; border-color: #17a2b8;">
+
+        <input type="submit" value="Tolak Lamaran" name="_reject_application" class="button" style="background-color: #dc3545; border-color: #dc3545;">
+
+        <input type="submit" value="Setujui Lamaran & Aktifkan Mentor" name="_approve_application" class="button default" style="background-color: #28a745; border-color: #28a745;">
+    </div>
+{% endblock %}

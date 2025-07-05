@@ -1,0 +1,91 @@
+{% extends 'base.html' %} {# Mewarisi dari base template Anda #}
+
+{% block title %}
+    {% if is_edit_mode %}
+        Edit Pelajaran: {{ lesson.title }}
+    {% else %}
+        Tambah Pelajaran ke {{ topic.title }}
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4 mb-5">
+    <nav aria-label="breadcrumb">
+         <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'mentor:home' %}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'mentor:materi_module_list' %}">Daftar Modul</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'mentor:module_detail_mentor' module_slug=topic.module.slug %}">{{ topic.module.title }}</a></li> 
+            <li class="breadcrumb-item"><a href="{% url 'mentor:topic_detail_mentor' slug=topic.slug %}">{{ topic.title }}</a></li> 
+            {# Judul breadcrumb dinamis #}
+            <li class="breadcrumb-item active" aria-current="page">
+                {% if is_edit_mode %}Edit Pelajaran{% else %}Tambah Pelajaran{% endif %}
+            </li>
+        </ol>
+    </nav>
+    <hr>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-10"> 
+            <div class="card">
+                <div class="card-header">
+                     {# MODIFIKASI: Judul card dinamis #}
+                    <h2>{% if is_edit_mode %}Edit Pelajaran: "{{ lesson.title }}"{% else %}Tambah Pelajaran Baru untuk Topik: "{{ topic.title }}"{% endif %}</h2> 
+                </div>
+                <div class="card-body">
+                    <form method="post" novalidate id="lesson-form"> 
+                        {% csrf_token %}
+                        {# ... (rendering form fields tidak berubah) ... #}
+                         {% for field in form %}
+                            <div class="mb-3">
+                                {{ field.label_tag }}
+                                {% if field.name == 'content' %} 
+                                    <textarea name="{{ field.name }}" id="id_content" class="form-control{% if field.errors %} is-invalid{% endif %}" rows="10">{{ field.value|default_if_none:'' }}</textarea>
+                                {% elif field.field.widget.input_type == 'number' %}
+                                    <input type="number" name="{{ field.name }}" id="{{ field.id_for_label }}" value="{{ field.value|default_if_none:'' }}" class="form-control{% if field.errors %} is-invalid{% endif %}" {% if field.field.min_value is not None %}min="{{ field.field.min_value }}"{% endif %} {% if field.field.max_value is not None %}max="{{ field.field.max_value }}"{% endif %} {% if field.field.required %}required{% endif %}>
+                                {% elif field.field.widget.input_type == 'select' %}
+                                    <select name="{{ field.name }}" id="{{ field.id_for_label }}" class="form-select{% if field.errors %} is-invalid{% endif %}">{{ field }}</select>
+                                {% else %}
+                                    <input type="{{ field.field.widget.input_type }}" name="{{ field.name }}" id="{{ field.id_for_label }}" value="{{ field.value|default_if_none:'' }}" class="form-control{% if field.errors %} is-invalid{% endif %}" {% if field.field.max_length %}maxlength="{{ field.field.max_length }}"{% endif %} {% if field.field.required %}required{% endif %}>
+                                {% endif %}
+                                {% if field.help_text %}<div class="form-text">{{ field.help_text|safe }}</div>{% endif %}
+                                {% if field.errors %}<div class="invalid-feedback">{% for error in field.errors %} {{ error }} {% endfor %}</div>{% endif %}
+                            </div>
+                        {% endfor %}
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{% url 'mentor:topic_detail_mentor' slug=topic.slug %}" class="btn btn-secondary me-md-2">Batal</a>
+                            {# MODIFIKASI: Teks Tombol dinamis #}
+                            <button type="submit" class="btn btn-primary">
+                                 {% if is_edit_mode %}Update Pelajaran{% else %}Simpan Pelajaran{% endif %}
+                            </button>
+                        </div>
+                    </form> 
+                </div> 
+            </div> 
+        </div> 
+    </div> 
+</div> 
+{% endblock %}
+
+{% block extra_js %}
+    {{ block.super }} 
+    {{ form.media }}
+    {# Script untuk init CKEditor dan update sebelum submit #}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const contentElement = document.getElementById('id_content');
+            if (contentElement) {
+                if (typeof CKEDITOR !== 'undefined') {
+                   try { CKEDITOR.replace('id_content'); } catch(e) { console.error(e); }
+                } else { console.error('CKEDITOR undefined.'); }
+            } else { console.error('id_content not found.'); }
+        });
+        const lessonForm = document.getElementById('lesson-form'); 
+        if (lessonForm) {
+            lessonForm.addEventListener('submit', function(event) {
+                const editorInstance = CKEDITOR.instances['id_content']; 
+                if (editorInstance) { editorInstance.updateElement(); }
+            });
+        }
+    </script>
+{% endblock %}

@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Daftar Artikel - Tutor Cerdas SaintekMU{% endblock %}
+
+{% block content %}
+{# Container utama dengan margin atas dan bawah (mt-5, mb-5) untuk jarak dari header/footer #}
+<div class="container mt-5 mb-5 article-list-page"> 
+    <h1 class="text-center mb-5">Artikel</h1> 
+
+    {% if articles %}
+        {# Menghapus .row dan .col, langsung loop untuk membuat card vertikal #}
+        {% for article in articles %} 
+            {# Setiap card diberi margin bawah (mb-4) untuk jarak vertikal #}
+            <div class="card shadow-sm mb-4"> 
+                
+                {% if article.featured_image %}
+                <img src="{{ article.featured_image.url }}" class="card-img-top" alt="{{ article.title }}">
+                {% endif %}
+                
+
+                <div class="card-body"> {# Tidak perlu d-flex flex-column lagi untuk layout ini #}
+                    <h5 class="card-title mb-2"> 
+                        <a href="{% url 'articles:article_detail' article.slug %}" class="text-decoration-none article-title-link"> 
+                            {{ article.title }}
+                        </a>
+                    </h5>
+                    <small class="text-body-secondary mb-3 d-block"> {# Metadata Penulis & Tanggal, dibuat block agar turun #}
+                        Ditulis oleh {{ article.author.username|default:"-" }} 
+                        | {{ article.created_at|date:"d F Y" }}
+                    </small>
+                    <p class="card-text text-muted"> {# Cuplikan Konten #}
+                        {{ article.content|striptags|truncatewords:40 }} {# Bisa sedikit lebih panjang karena lebar penuh #}
+                    </p>
+                    {# Tombol Baca Selengkapnya #}
+                    <a href="{% url 'articles:article_detail' article.slug %}" class="btn btn-sm btn-outline-warning">Baca Selengkapnya</a>
+                </div>
+            </div>
+        {% endfor %}
+
+        {# Tempat untuk navigasi halaman (pagination) nanti #}
+        {# <div class="mt-4 d-flex justify-content-center"> #} {# Margin atas pagination bisa dikurangi #}
+        {#   {% include 'partials/_pagination.html' with page_obj=page_obj %} #}
+        {# </div> #}
+
+    {% else %}
+        <p class="text-center">Belum ada artikel yang diterbitkan.</p>
+    {% endif %}
+
+</div> {# Akhir div.container #}
+{% endblock %}

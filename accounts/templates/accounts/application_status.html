@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Status Lamaran Anda{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-7">
+            <div class="card shadow-lg border-0 rounded-lg text-center">
+
+                {% if application.status == 'PENDING' %}
+                    <div class="card-header bg-info text-white">
+                        <h4 class="mb-0">Lamaran Sedang Ditinjau</h4>
+                    </div>
+                    <div class="card-body p-4 p-md-5">
+                        <i class="bi bi-hourglass-split text-info" style="font-size: 4rem;"></i>
+                        <h3 class="mt-3">Terima Kasih Telah Mendaftar!</h3>
+                        <p class="lead text-muted">
+                            Lamaran Anda sebagai pengajar di <strong>Tutor Cerdas SaintekMu</strong> telah kami terima dan sedang dalam proses peninjauan oleh tim kami. 
+                        </p>
+                        <p>Kami akan memberitahukan hasilnya melalui email dalam beberapa hari ke depan. Anda bisa logout untuk saat ini.</p>
+                    </div>
+
+                {% elif application.status == 'REVIEW' %}
+                    <div class="card-header bg-primary text-white">
+                        <h4 class="mb-0">Lamaran Anda Sedang Direview</h4>
+                    </div>
+                    <div class="card-body p-4 p-md-5">
+                        <i class="bi bi-search text-primary" style="font-size: 4rem;"></i>
+                        <h3 class="mt-3">Satu Langkah Lebih Dekat!</h3>
+                        <p class="lead text-muted">
+                            Kabar baik! Lamaran Anda telah kami terima dan saat ini sedang direview secara langsung oleh tim kami.
+                        </p>
+                        <p>Mohon bersabar, kami akan segera memberikan keputusan. Anda bisa logout untuk saat ini.</p>
+                    </div>
+                
+                {% elif application.status == 'REJECTED' %}
+                    <div class="card-header bg-danger text-white">
+                        <h4 class="mb-0">Status Lamaran Ditolak</h4>
+                    </div>
+                    <div class="card-body p-4 p-md-5">
+                        <i class="bi bi-x-circle-fill text-danger" style="font-size: 4rem;"></i>
+                        <h3 class="mt-3">Mohon Maaf</h3>
+                        <p class="lead text-muted">
+                            Setelah melalui proses peninjauan, dengan berat hati kami sampaikan bahwa lamaran Anda belum dapat kami terima saat ini.
+                        </p>
+                        <p>Kami sangat menghargai waktu dan usaha yang telah Anda luangkan. Jangan berkecil hati dan tetap semangat! Untuk pertanyaan lebih lanjut, Anda bisa menghubungi tim kami.</p>
+                    </div>
+
+                {% elif application.status == 'APPROVED' %}
+                    <div class="card-header bg-success text-white">
+                        <h4 class="mb-0">Lamaran Disetujui!</h4>
+                    </div>
+                     <div class="card-body p-4 p-md-5">
+                        <i class="bi bi-check-circle-fill text-success" style="font-size: 4rem;"></i>
+                        <h3 class="mt-3">Selamat!</h3>
+                        <p class="lead">Anda sekarang adalah bagian dari tim pengajar kami. Silakan masuk ke dashboard Anda.</p>
+                        <a href="{% url 'mentor:home' %}" class="btn btn-primary">Masuk ke Dashboard</a>
+                    </div>
+                {% endif %}
+
+                <div class="card-footer bg-light">
+                    <form action="{% url 'accounts:logout' %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-secondary">
+                            <i class="bi bi-box-arrow-right me-2"></i>Logout
+                        </button>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

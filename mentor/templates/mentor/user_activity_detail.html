@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Aktivitas: {{ student.get_full_name|default:student.username }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4 mb-5">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'mentor:home' %}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'mentor:analisis' %}">Analisis Pengguna</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ student.get_full_name|default:student.username }}</li>
+        </ol>
+    </nav>
+    <hr>
+
+    <h1 class="mb-4">Detail Aktivitas: {{ student.get_full_name|default:student.username }}</h1>
+    
+    <div class="row">
+        <div class="col-12 mb-4">
+            <div class="card h-100">
+                <div class="card-header bg-info text-white">
+                    <i class="bi bi-shield-check me-2"></i> Riwayat Upaya Pre-test ({{ pretest_attempts.count }})
+                </div>
+                <div class="card-body" style="max-height: 300px; overflow-y: auto;">
+                    {% if pretest_attempts %}
+                        <ul class="list-group list-group-flush">
+                            {% for attempt in pretest_attempts %}
+                                <li class="list-group-item small lh-sm">
+                                    <span class="float-end text-muted">{{ attempt.completed_at|date:"d M Y" }}</span>
+                                    <strong>Pre-test:</strong> {{ attempt.quiz.title|truncatechars:40 }}
+                                    <br>
+                                    <span class="fw-bold">Skor: {{ attempt.score|floatformat:1 }}%</span>
+                                    </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p class="text-muted fst-italic p-3">Pengguna ini belum mengerjakan pre-test apapun.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {# Kolom untuk Progres Pelajaran Pengguna Ini #}
+        <div class="col-lg-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header">
+                    <i class="bi bi-check-circle me-2"></i> Riwayat Penyelesaian Pelajaran ({{ progress_records.count }})
+                </div>
+                <div class="card-body" style="max-height: 450px; overflow-y: auto;">
+                    {% if progress_records %}
+                        <ul class="list-group list-group-flush">
+                           {% for progress in progress_records %}
+                                <li class="list-group-item small lh-sm"> 
+                                    <span class="float-end text-muted">{{ progress.completed_at|date:"d M Y" }}</span>
+                                    <strong>Selesai:</strong> {{ progress.lesson.title|truncatechars:40 }}
+                                    <br>
+                                    <span class="text-muted">(Topik: {{ progress.lesson.topic.title|truncatechars:30 }})</span>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p class="text-muted fst-italic p-3">Pengguna ini belum menyelesaikan pelajaran apapun.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        {# Kolom untuk Upaya Post-test Pengguna Ini #}
+        <div class="col-lg-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header">
+                    <i class="bi bi-file-alt me-2"></i> Riwayat Upaya Post-test ({{ quiz_attempts.count }})
+                </div>
+                <div class="card-body" style="max-height: 450px; overflow-y: auto;">
+                    {% if quiz_attempts %}
+                        <ul class="list-group list-group-flush">
+                            {% for attempt in quiz_attempts %}
+                                <li class="list-group-item small lh-sm">
+                                    <span class="float-end text-muted">{{ attempt.completed_at|date:"d M Y" }}</span>
+                                    <strong>Post-test:</strong> {{ attempt.quiz.title|truncatechars:30 }}
+                                    <br>
+                                    <span class="fw-bold">Skor: {{ attempt.score|floatformat:1 }}%</span> - 
+                                    {% if attempt.passed %}
+                                        <span class="badge bg-success">Lulus</span>
+                                    {% else %}
+                                        <span class="badge bg-danger">Gagal</span>
+                                    {% endif %}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p class="text-muted fst-italic p-3">Pengguna ini belum mencoba post-test apapun.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <a href="{% url 'mentor:analisis' %}" class="btn btn-secondary">&laquo; Kembali ke Daftar Pengguna</a>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,155 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    {% if is_edit_mode %}
+        Edit Pertanyaan Kuis: {{ quiz.title }}
+    {% else %}
+        Tambah Pertanyaan ke Kuis: {{ quiz.title }}
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4 mb-5">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'mentor:home' %}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'mentor:materi_module_list' %}">Daftar Modul</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'mentor:module_detail_mentor' module_slug=quiz.topic.module.slug %}">{{ quiz.topic.module.title }}</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'mentor:topic_detail_mentor' slug=quiz.topic.slug %}">{{ quiz.topic.title }}</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'mentor:list_questions' quiz_pk=quiz.pk %}">Kelola Kuis: {{ quiz.title }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">
+                {% if is_edit_mode %}Edit Pertanyaan{% else %}Tambah Pertanyaan{% endif %}
+            </li>
+        </ol>
+    </nav>
+    <hr>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card">
+                <div class="card-header">
+                    <h2>
+                        {% if is_edit_mode %}
+                            Edit Pertanyaan #{{ question.order }} untuk Kuis: "{{ quiz.title }}"
+                        {% else %}
+                            Tambah Pertanyaan Baru ke Kuis: "{{ quiz.title }}"
+                        {% endif %}
+                    </h2>
+                </div>
+                <div class="card-body">
+                    <form method="post" novalidate id="question-choice-form">
+                        {% csrf_token %}
+
+                        {# Error Non-Field Form Utama #}
+                        {% if form.non_field_errors %}<div class="alert alert-danger">{% for error in form.non_field_errors %} {{ error }} {% endfor %}</div>{% endif %}
+
+                        {# Render Field Form Utama (QuestionForm) #}
+                        <fieldset class="mb-4">
+                            <legend class="h5">Detail Pertanyaan</legend>
+                            {% for field in form %}
+                                <div class="mb-3">
+                                    {{ field.label_tag }}
+                                    {% if field.field.widget.input_type == 'textarea' %}
+                                        <textarea name="{{ field.name }}" id="{{ field.id_for_label }}" class="form-control{% if field.errors %} is-invalid{% endif %}" rows="4">{{ field.value|default_if_none:'' }}</textarea>
+                                    {% elif field.field.widget.input_type == 'number' %}
+                                         <input type="number" name="{{ field.name }}" id="{{ field.id_for_label }}" value="{{ field.value|default_if_none:'' }}" class="form-control{% if field.errors %} is-invalid{% endif %}" {% if field.field.min_value is not None %}min="{{ field.field.min_value }}"{% endif %} {% if field.field.max_value is not None %}max="{{ field.field.max_value }}"{% endif %} {% if field.field.required %}required{% endif %}>
+                                    {% else %}
+                                         <input type="{{ field.field.widget.input_type }}" name="{{ field.name }}" id="{{ field.id_for_label }}" value="{{ field.value|default_if_none:'' }}" class="form-control{% if field.errors %} is-invalid{% endif %}" {% if field.field.max_length %}maxlength="{{ field.field.max_length }}"{% endif %} {% if field.field.required %}required{% endif %}>
+                                    {% endif %}
+                                    {% if field.help_text %}<div class="form-text">{{ field.help_text|safe }}</div>{% endif %}
+                                    {% if field.errors %}<div class="invalid-feedback">{% for error in field.errors %} {{ error }} {% endfor %}</div>{% endif %}
+                                </div>
+                            {% endfor %}
+                        </fieldset>
+
+                        <hr>
+
+                        {# Render Formset Pilihan Jawaban (ChoiceFormSet) #}
+                        <fieldset>
+                            <legend class="h5">Pilihan Jawaban</legend>
+                             {% if formset.non_form_errors %}<div class="alert alert-danger">{% for error in formset.non_form_errors %} {{ error }} {% endfor %}</div>{% endif %}
+
+                            {# Management Form - WAJIB! #}
+                            {{ formset.management_form }}
+
+                            {% for choice_form in formset %}
+                                {# Beri ID unik untuk setiap div form pilihan #}
+                                <div class="choice-form mb-3 p-3 border rounded" id="choice-{{ forloop.counter0 }}-form"> 
+                                    {# ID Pilihan (Hidden, untuk update/delete) #}
+                                    {{ choice_form.id }} 
+                                    
+                                    <div class="row g-2 align-items-center">
+                                        {# Kolom untuk Teks Pilihan #}
+                                        <div class="col-sm-8">
+                                            <label for="{{ choice_form.prefix }}-text" class="visually-hidden">{{ choice_form.text.label }}</label> {# Label tersembunyi untuk aksesibilitas #}
+                                            <input type="text" 
+                                                   name="{{ choice_form.prefix }}-text" 
+                                                   id="{{ choice_form.prefix }}-text" 
+                                                   value="{{ choice_form.text.value|default_if_none:'' }}" 
+                                                   class="form-control form-control-sm {% if choice_form.text.errors %}is-invalid{% endif %}" 
+                                                   placeholder="Teks Pilihan Jawaban {{ forloop.counter }}"
+                                                   maxlength="500">
+                                            {% if choice_form.text.errors %}
+                                                <div class="invalid-feedback d-block">
+                                                    {% for error in choice_form.text.errors %}{{ error }}{% endfor %}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                        {# Kolom untuk Checkbox 'Benar' #}
+                                        <div class="col-sm-2 mt-2 mt-sm-0">
+                                            <div class="form-check form-check-inline pt-sm-2">
+                                                <input type="checkbox" 
+                                                       name="{{ choice_form.prefix }}-is_correct" 
+                                                       id="{{ choice_form.prefix }}-is_correct" 
+                                                       class="form-check-input {% if choice_form.is_correct.errors %}is-invalid{% endif %}" 
+                                                       {% if choice_form.is_correct.value %}checked{% endif %}>
+                                                <label for="{{ choice_form.prefix }}-is_correct" class="form-check-label">
+                                                    Benar?
+                                                </label>
+                                                {% if choice_form.is_correct.errors %}<div class="invalid-feedback d-block">{% for error in choice_form.is_correct.errors %}{{ error }}{% endfor %}</div>{% endif %}
+                                            </div>
+                                        </div>
+                                        {# Kolom untuk Checkbox 'Hapus' (HANYA tampil di mode edit & untuk form yg sudah ada datanya) #}
+                                        <div class="col-sm-2 mt-2 mt-sm-0">
+                                            {% if formset.can_delete and choice_form.instance.pk %} {# Cek bisa hapus & instance sudah ada #}
+                                                <div class="form-check form-check-inline pt-sm-2">
+                                                    {{ choice_form.DELETE }} {# Checkbox Hapus #}
+                                                     <label for="{{ choice_form.prefix }}-DELETE" class="form-check-label text-danger"> Hapus</label>
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </div> {# End row #}
+                                     {# Error per form pilihan #}
+                                     {% if choice_form.non_field_errors %}<div class="alert alert-danger mt-2 p-1">{% for error in choice_form.non_field_errors %}{{ error }}{% endfor %}</div>{% endif %}
+                                </div> {# End choice-form div #}
+                            {% endfor %}
+                        </fieldset>
+
+                        <hr>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            {# Tombol Batal kembali ke daftar pertanyaan kuis ini #}
+                            <a href="{% url 'mentor:list_questions' quiz_pk=quiz.pk %}" class="btn btn-secondary me-md-2">Batal</a>
+                             {# Teks Tombol dinamis #}
+                            <button type="submit" class="btn btn-primary">
+                                {% if is_edit_mode %}Update Pertanyaan{% else %}Simpan Pertanyaan & Pilihan{% endif %}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+    {{ block.super }} 
+    {# Muat JS/CSS CKEditor #}
+    {# Kita TIDAK pakai CKEditor di form pertanyaan/pilihan ini, jadi form.media tidak wajib #}
+    {# Jika field 'text' pertanyaan ingin pakai CKEditor, ubah model Question & aktifkan form.media #}
+    {# {{ form.media }} #}
+
+    {# Script untuk update element jika nanti field Question.text pakai CKEditor #}
+    {# <script>  </script> #}
+{% endblock %}

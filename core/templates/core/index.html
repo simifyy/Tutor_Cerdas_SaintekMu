@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Selamat Datang - Tutor Cerdas SaintekMU{% endblock %}
+
+{% block content %}
+{# ================================== #}
+{# == BAGIAN HERO SECTION (BARU) == #}
+{# ================================== #}
+<div class="hero-section text-white text-center">
+    <div class="container d-flex flex-column justify-content-center">
+        <h1 class="display-4 fw-bold mb-3">Selamat Datang di Tutor Cerdas SaintekMU</h1>
+        <p class="lead mb-4 mx-auto" style="max-width: 700px;">
+            Platform pembelajaran pemrograman adaptif untuk Universitas Saintek Muhammadiyah. Mulai belajar HTML dan PHP dasar dengan cara yang lebih personal dan efektif.
+        </p>
+        <div>
+            <a href="{% url 'learning:module_list' %}" class="btn btn-light btn-lg mb-2 mb-md-0">Mulai Belajar Sekarang</a>
+        </div>
+    </div>
+</div>
+
+{# ====================================== #}
+{# == KONTEN UTAMA HALAMAN (LANJUTAN) == #}
+{# ====================================== #}
+<div class="container mt-5 mb-5">
+    <h2 class="text-center mb-4">Artikel Terbaru</h2>
+    <div class="row g-4 justify-content-center"> {# Tambah justify-content-center #}
+
+        {# === LOOPING ARTIKEL TERBARU === #}
+        {# Gunakan variabel konteks 'recent_articles' dari view #}
+        {% if recent_articles %}
+            {% for article in recent_articles %}
+                <div class="col-md-6 col-lg-4"> {# Ukuran kolom bisa disesuaikan #}
+                    <div class="card h-100 shadow-sm">
+                        {# Opsional: Gambar Artikel #}
+                        {% if article.featured_image %}
+                            <a href="{% url 'articles:article_detail' article.slug %}"> {# Link pada gambar #}
+                                <img src="{{ article.featured_image.url }}" class="card-img-top" alt="{{ article.title }}" style="height: 180px; object-fit: cover;">
+                            </a>
+                        {% endif %}
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title">
+                                <a href="{% url 'articles:article_detail' article.slug %}" class="text-decoration-none article-title-link">
+                                    {{ article.title }}
+                                </a>
+                            </h5>
+                            <p class="card-text text-muted flex-grow-1"> {# flex-grow agar deskripsi mengisi #}
+                                {# Menggunakan konten artikel, dipotong, hapus tag HTML #}
+                                {{ article.content|striptags|truncatewords:20 }} 
+                            </p>
+                            <p class="card-text mt-auto pt-2"> {# mt-auto dorong ke bawah #}
+                                <small class="text-body-secondary">
+                                    Ditulis oleh {{ article.author.username|default:"-" }}
+                                    |   Diterbitkan: {{ article.created_at|date:"d M Y" }} 
+                                </small>
+                            </p>
+                            {# === TOMBOL BACA SELENGKAPNYA FUNGSIONAL === #}
+                            <a href="{% url 'articles:article_detail' article.slug %}" class="btn btn-sm btn-outline-warning align-self-start mt-2">
+                                Baca Selengkapnya
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-12 text-center">
+                <p class="text-muted">Belum ada artikel terbaru.</p>
+            </div>
+        {% endif %}
+        {# === AKHIR LOOP === #}
+
+    </div> {# End row #}
+
+    {# Tombol Lihat Semua Artikel #}
+    <div class="text-center mt-5"> {# Beri jarak lebih #}
+         <a href="{% url 'articles:article_list' %}" class="btn btn-outline-secondary">Lihat Semua Artikel »</a>
+    </div>
+
+</div>
+{% endblock %}

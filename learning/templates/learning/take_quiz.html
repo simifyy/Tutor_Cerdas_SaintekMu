@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+{% load static %} {# Muat static jika perlu #}
+
+{% block title %}Kuis: {{ quiz.title }} - Tutor Cerdas SaintekMU{% endblock %}
+
+{% block content %}
+{# Container utama dengan margin atas dan bawah #}
+<div class="container mt-5 mb-5 quiz-page"> 
+    <div class="row justify-content-center">
+        {# Batasi lebar konten kuis #}
+        <div class="col-lg-8"> 
+
+            <div class="card sticky-top shadow-sm mb-4" style="top: 80px; z-index: 1000;">
+                <div class="card-body text-center bg-light">
+                    <h5 class="mb-0">Sisa Waktu: <span id="quiz-timer" class="fw-bold text-danger">--:--</span></h5>
+                </div>
+            </div>
+
+            {# Judul dan Deskripsi Kuis - Rata Tengah #}
+            <div class="text-center mb-5">
+                <h1 class="fw-bold">Kuis: {{ quiz.title }}</h1>
+                {% if quiz.description %}
+                    <p class="lead text-muted">{{ quiz.description }}</p>
+                {% endif %}
+                <hr>
+            </div>
+
+            <form method="post" action="" id="quiz-form" onsubmit="document.getElementById('quiz-submit-button').disabled=true;"> 
+                {% csrf_token %}
+
+                {% if questions %} 
+                    {% for question in questions %} 
+                        <div class="card mb-4 shadow-sm">
+                            <div class="card-header bg-light py-3">
+                                <h5 class="mb-0 fw-medium">Pertanyaan {{ forloop.counter }}:</h5> 
+                            </div>
+                            <div class="card-body px-4 py-4">
+                                <p class="card-text fs-5 mb-4">{{ question.text|linebreaksbr }}</p> 
+
+                                <div class="ms-2"> 
+                                    {% for choice in question.choices.all %}
+                                        <div class="form-check mb-3">
+                                            <input class="form-check-input" type="radio"
+                                                   name="question_{{ question.pk }}" 
+                                                   id="choice_{{ choice.pk }}" 
+                                                   value="{{ choice.pk }}"
+                                                   required> 
+                                            <label class="form-check-label" for="choice_{{ choice.pk }}">
+                                                {{ choice.text }} 
+                                            </label>
+                                        </div>
+                                    {% empty %}
+                                        <p class="text-danger small"><em>(Belum ada pilihan jawaban)</em></p>
+                                    {% endfor %} 
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+
+                    <div class="text-center mt-5">
+                        <button type="submit" id="quiz-submit-button" class="btn btn-warning btn-lg px-5">Kirim Jawaban</button>
+                    </div>
+
+                {% else %}
+                    <div class="col-12 text-center">
+                        <p>Belum ada pertanyaan untuk kuis ini.</p>
+                        <a href="{% url 'learning:module_detail' module.slug %}" class="btn btn-secondary mt-3">Kembali ke Modul</a>
+                    </div>
+                {% endif %}
+
+            </form>
+
+            {% if questions %}
+                <hr class="my-5">
+                <div class="text-center"> 
+                    {% if quiz.topic %} 
+                    <a href="{% url 'learning:module_detail' quiz.topic.module.slug %}" class="btn btn-outline-secondary">&laquo; Kembali ke Modul</a>
+                    {% endif %}
+                </div>
+            {% endif %}
+
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const timerDisplay = document.getElementById('quiz-timer');
+    const quizForm = document.getElementById('quiz-form');
+    const submitButton = document.getElementById('quiz-submit-button'); // Ambil tombol submit
+
+    if (timerDisplay && quizForm && submitButton) {
+        let durationInSeconds = {{ quiz.time_limit_minutes|default:15 }} * 60;
+
+        const timerInterval = setInterval(function() {
+            const minutes = Math.floor(durationInSeconds / 60);
+            let seconds = durationInSeconds % 60;
+            seconds = seconds < 10 ? '0' + seconds : seconds;
+            timerDisplay.textContent = minutes + ":" + seconds;
+            durationInSeconds--;
+
+            if (durationInSeconds < 0) {
+                clearInterval(timerInterval);
+                timerDisplay.textContent = "Waktu Habis!";
+                alert("Waktu pengerjaan telah habis. Jawaban Anda akan dikirim secara otomatis.");
+                
+                // Nonaktifkan tombol sebelum submit otomatis
+                submitButton.disabled = true;
+                quizForm.submit();
+            }
+        }, 1000);
+    }
+});
+</script>
+{% endblock %}

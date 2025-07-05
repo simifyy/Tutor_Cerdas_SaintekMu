@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Dashboard - {{ user.get_full_name|default:user.username }}{% endblock %}
+
+{% block content %}
+{# Container utama dengan margin atas dan bawah #}
+<div class="container mt-5 mb-5 user-dashboard-page">
+
+    {# 1. Bagian Sambutan #}
+    <div class="alert alert-dismissible fade show mb-5" role="alert" style="background-color: var(--warna-utama); color: var(--warna-putih); border-color: var(--warna-utama-gelap);">
+        <h2 class="alert-heading fw-bold">Selamat datang kembali, {{ user.get_full_name|default:user.username }}!</h2>
+        <p class="mb-0">Ini adalah halaman dashboard Anda. Lihat progres belajar Anda di bawah dan lanjutkan petualangan coding Anda!</p>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+
+    {# 2. Bagian Progres Pembelajaran (dalam Card) #}
+    <div class="card shadow-sm">
+        <div class="card-header bg-light py-3">
+            <h3 class="mb-0">Ringkasan Progres Pembelajaran Anda</h3>
+        </div>
+        <div class="card-body p-4">
+            {% if module_progress_list %}
+                {% for item in module_progress_list %}
+                    <div class="mb-4"> 
+                        <div class="d-flex justify-content-between mb-1">
+                            <a href="{% url 'learning:module_detail' item.module.slug %}" class="fw-bold text-decoration-none themed-link h5 mb-0">
+                              {{ item.module.title }}
+                            </a>
+                            <span class="text-muted">
+                              {{ item.completed }} / {{ item.total }} Pelajaran
+                            </span>
+                        </div>
+                        
+                        {% if item.total > 0 %}
+                            <div class="progress mt-2" role="progressbar" 
+                                 aria-label="Progres {{ item.module.title }}" 
+                                 aria-valuenow="{{ item.percentage }}" aria-valuemin="0" aria-valuemax="100" 
+                                 style="height: 18px;"> 
+                                
+                                {# === PERUBAHAN WARNA PROGRESS BAR (MERAH/HIJAU SOLID) === #}
+                                {# Hapus kelas striped & animated. Gunakan if/else untuk bg-success / bg-danger #}
+                                <div class="progress-bar fw-semibold
+                                    {% if item.percentage == 100 %}
+                                        bg-success 
+                                    {% else %}
+                                        bg-danger  {# <<< Ganti warna untuk < 100% menjadi merah #}
+                                    {% endif %}" 
+                                     style="width: {{ item.percentage }}%" 
+                                     {# Style inline background-color dihapus #}
+                                     >
+                                     {{ item.percentage }}%
+                                </div>
+                                {# === AKHIR PERUBAHAN WARNA === #}
+                            </div>
+                        {% else %}
+                            <p class="text-muted small mb-0 mt-1"><em>(Belum ada pelajaran)</em></p>
+                        {% endif %}
+                    </div>
+                {% empty %} 
+                    <p class="text-center text-muted py-4">Anda belum memulai modul pembelajaran apapun.</p>
+                {% endfor %}
+
+                {% if module_progress_list %} 
+                    <div class="text-center mt-5"> 
+                        <a href="{% url 'learning:module_list' %}" class="btn btn-warning btn-lg">
+                            Lanjut Belajar
+                        </a>
+                    </div>
+                {% else %} 
+                    <div class="text-center mb-3">
+                         <a href="{% url 'learning:module_list' %}" class="btn btn-primary">Mulai Belajar Sekarang</a>
+                     </div>
+                {% endif %}
+
+            {% else %}
+                 <p class="text-center text-muted py-4">Progres pembelajaran Anda belum tersedia.</p>
+                 <div class="text-center mb-3">
+                     <a href="{% url 'learning:module_list' %}" class="btn btn-primary">Mulai Belajar Sekarang</a>
+                 </div>
+            {% endif %}
+        </div> {# Akhir card-body #}
+    </div> {# Akhir card #}
+
+</div> {# Akhir container #}
+{% endblock %}

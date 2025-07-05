@@ -1,0 +1,97 @@
+/* core/static/css/admin_custom.css */
+
+/* ================================== */
+/* == GAYA HALAMAN LOGIN (SUDAH ADA) == */
+/* ================================== */
+body.login {
+    background: #f0f2f5;
+}
+.login #container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 80vh;
+}
+.login #content-main {
+    background: #ffffff;
+    padding: 2.5rem;
+    border: none;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 450px;
+}
+.login .form-row label {
+    color: #333 !important;
+}
+
+/* ================================================= */
+/* == GAYA BARU UNTUK DASHBOARD & HALAMAN ADMIN LAIN == */
+/* ================================================= */
+
+/* Header Utama */
+#header {
+    background: #00263b; /* Warna biru gelap tema Anda */
+    color: #ffffff;
+}
+#branding h1 a:link, 
+#branding h1 a:visited {
+    color: #ffffff;
+}
+
+/* Teks sambutan "Selamat Datang..." */
+#user-tools {
+    color: #ffffff;
+}
+#user-tools a {
+    color: #e6f7ff;
+    text-decoration: underline;
+}
+
+/* Judul Modul Aplikasi (contoh: ACCOUNTS, ARTICLES) */
+.module caption,
+.module h2 {
+    background: #0f4a6e; /* Warna biru yang sedikit lebih terang */
+    color: #ffffff;
+    border-radius: 4px 4px 0 0;
+}
+
+/* Tombol utama dan link aksi */
+.button, 
+input[type=submit], 
+input[type=button], 
+.submit-row input {
+    background: #ffc107; /* Warna kuning tema Anda */
+    color: #212529;
+    font-weight: bold;
+    border: 1px solid #e9b006;
+    border-radius: 4px;
+    padding: 10px 15px;
+}
+.button:hover, 
+input[type=submit]:hover, 
+input[type=button]:hover, 
+.submit-row input:hover {
+    background: #e9b006;
+}
+
+/* Tombol Hapus (Delete) */
+.button.deletelink, a.deletelink {
+    background: #dc3545; /* Warna merah untuk aksi berbahaya */
+    color: #fff;
+    border-color: #c82333;
+}
+.button.deletelink:hover, a.deletelink:hover {
+    background: #c82333;
+}
+
+/* Link di dalam konten utama */
+#content a:link, #content a:visited {
+    color: #0d6efd;
+}
+
+/* Sidebar "Tindakan Terbaru" */
+#content-related .module h3 {
+    background: #e9ecef;
+    color: #495057;
+}

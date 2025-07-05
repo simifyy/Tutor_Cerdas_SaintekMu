@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Profil Mentor{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-body p-4 p-md-5">
+                    <h2 class="text-center mb-4">Edit Profil Anda</h2>
+                    <hr>
+                    <form method="post" enctype="multipart/form-data" novalidate>
+                        {% csrf_token %}
+                        
+                        {% if form.non_field_errors %}
+                            <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+                        {% endif %}
+
+                        <div class="mb-3">
+                            <label for="{{ form.profile_picture.id_for_label }}" class="form-label fw-bold">{{ form.profile_picture.label }}</label>
+                            {% if form.instance.profile_picture %}
+                                <p class="text-muted small mb-1">Foto saat ini: <a href="{{ form.instance.profile_picture.url }}" target="_blank">Lihat</a> | Untuk mengganti, unggah file baru di bawah ini.</p>
+                            {% endif %}
+                            {{ form.profile_picture }}
+                            {% if form.profile_picture.help_text %}
+                                <div class="form-text text-muted small mt-1">{{ form.profile_picture.help_text }}</div>
+                            {% endif %}
+                            {% for error in form.profile_picture.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.full_name.id_for_label }}" class="form-label fw-bold">{{ form.full_name.label }}</label>
+                            {{ form.full_name }}
+                            {% for error in form.full_name.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.expertise.id_for_label }}" class="form-label fw-bold">{{ form.expertise.label }}</label>
+                            {{ form.expertise }}
+                            {% for error in form.expertise.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.bio.id_for_label }}" class="form-label fw-bold">{{ form.bio.label }}</label>
+                            {{ form.bio }}
+                            {% if form.bio.help_text %}
+                                <div class="form-text text-muted small mt-1">{{ form.bio.help_text }}</div>
+                            {% endif %}
+                            {% for error in form.bio.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+                        </div>
+
+                        <hr>
+                        <h5 class="text-muted mb-3">Informasi Kontak</h5>
+
+                        <div class="mb-3">
+                            <label for="{{ form.email.id_for_label }}" class="form-label fw-bold">{{ form.email.label }}</label>
+                            {{ form.email }}
+                            {% for error in form.email.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.phone_number.id_for_label }}" class="form-label fw-bold">{{ form.phone_number.label }}</label>
+                            {{ form.phone_number }}
+                            {% for error in form.phone_number.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2 mt-4">
+                            <a href="{% url 'mentor:profile' %}" class="btn btn-secondary">Batal</a>
+                            <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

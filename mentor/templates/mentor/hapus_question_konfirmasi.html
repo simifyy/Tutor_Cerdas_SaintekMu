@@ -1,0 +1,55 @@
+{% extends 'base.html' %} {# Mewarisi dari base template Anda #}
+
+{% block title %}Konfirmasi Hapus Pertanyaan{% endblock %}
+
+{% block content %}
+<div class="container mt-4 mb-5">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'mentor:home' %}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'mentor:materi_module_list' %}">Daftar Modul</a></li>
+            {# Asumsi quiz.topic.module ada #}
+            <li class="breadcrumb-item"><a href="{% url 'mentor:module_detail_mentor' module_slug=quiz.topic.module.slug %}">{{ quiz.topic.module.title }}</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'mentor:topic_detail_mentor' slug=quiz.topic.slug %}">{{ quiz.topic.title }}</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'mentor:list_questions' quiz_pk=quiz.pk %}">Kelola Kuis: {{ quiz.title }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Konfirmasi Hapus Pertanyaan</li>
+        </ol>
+    </nav>
+    <hr>
+
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card border-danger"> {# Border merah untuk penekanan #}
+                <div class="card-header bg-danger text-white">
+                    <h2>Konfirmasi Penghapusan Pertanyaan</h2>
+                </div>
+                <div class="card-body">
+                    <p>Apakah Anda yakin ingin menghapus pertanyaan berikut dari Kuis "{{ quiz.title }}"?</p>
+
+                    {# Tampilkan teks pertanyaan yang akan dihapus #}
+                    <blockquote class="blockquote">
+                       <p>"{{ question.text|truncatewords:30 }}"</p>
+                    </blockquote>
+
+                    <p class="text-danger fw-bold mt-3">
+                        PERINGATAN: Menghapus pertanyaan ini juga akan menghapus SEMUA pilihan jawaban (Choice) yang terkait dengannya secara permanen! Tindakan ini tidak dapat diurungkan.
+                    </p>
+
+                    {# Form untuk mengirim konfirmasi hapus (metode POST) #}
+                    <form method="post">
+                        {% csrf_token %} {# Token keamanan Django #}
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                            {# Tombol Batal, kembali ke halaman daftar pertanyaan kuis ini #}
+                            <a href="{% url 'mentor:list_questions' quiz_pk=quiz.pk %}" class="btn btn-secondary me-md-2">Batal</a>
+
+                            {# Tombol Konfirmasi Hapus (Submit form) #}
+                            <button type="submit" class="btn btn-danger">Ya, Hapus Pertanyaan Ini</button>
+                        </div>
+                    </form>
+                </div> {# Akhir card-body #}
+            </div> {# Akhir card #}
+        </div> {# Akhir col #}
+    </div> {# Akhir row #}
+</div> {# Akhir container #}
+{% endblock %}

@@ -1,0 +1,52 @@
+{% extends 'base.html' %} {# Mewarisi dari base template Anda #}
+
+{% block title %}Konfirmasi Hapus Pelajaran{% endblock %}
+
+{% block content %}
+<div class="container mt-4 mb-5">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'mentor:home' %}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'mentor:materi_module_list' %}">Daftar Modul</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'mentor:module_detail_mentor' module_slug=topic.module.slug %}">{{ topic.module.title }}</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'mentor:topic_detail_mentor' slug=topic.slug %}">{{ topic.title }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Konfirmasi Hapus Pelajaran</li>
+        </ol>
+    </nav>
+    <hr>
+
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card border-danger"> {# Border merah untuk penekanan #}
+                <div class="card-header bg-danger text-white">
+                    <h2>Konfirmasi Penghapusan Pelajaran</h2>
+                </div>
+                <div class="card-body">
+                    <p>Apakah Anda yakin ingin menghapus pelajaran berikut secara permanen?</p>
+
+                    {# Tampilkan judul pelajaran yang akan dihapus #}
+                    <h4 class="text-danger">{{ lesson.title }}</h4>
+
+                    {# Tampilkan topik induknya #}
+                    <p class="text-muted"> (Dari Topik: {{ topic.title }}) </p>
+
+                    <p>Tindakan ini tidak dapat diurungkan.</p>
+
+                    {# Form untuk mengirim konfirmasi hapus (metode POST) #}
+                    <form method="post">
+                        {% csrf_token %} {# Token keamanan Django #}
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                            {# Tombol Batal, kembali ke halaman detail topik induknya #}
+                            <a href="{% url 'mentor:topic_detail_mentor' slug=topic.slug %}" class="btn btn-secondary me-md-2">Batal</a>
+
+                            {# Tombol Konfirmasi Hapus (Submit form) #}
+                            <button type="submit" class="btn btn-danger">Ya, Hapus Pelajaran Ini</button>
+                        </div>
+                    </form>
+                </div> {# Akhir card-body #}
+            </div> {# Akhir card #}
+        </div> {# Akhir col #}
+    </div> {# Akhir row #}
+</div> {# Akhir container #}
+{% endblock %}

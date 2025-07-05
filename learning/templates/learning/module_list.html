@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Modul Pembelajaran - Tutor Cerdas SaintekMU{% endblock %}
+
+{% block content %}
+{# Container utama dengan margin atas dan bawah #}
+<div class="container mt-5 mb-5 module-list-page">
+
+    {# Judul Halaman dan Deskripsi - Rata Tengah #}
+    <div class="text-center mb-5">
+        <h1 class="fw-bold">Modul Pembelajaran</h1>
+        <p class="lead text-muted">Pilih modul yang ingin Anda pelajari untuk memulai.</p>
+    </div>
+
+    {# Grid: 1 kolom default, 2 di md, 3 di lg. g-4 untuk jarak #}
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 justify-content-center"> 
+        {% if modules %} 
+            {% for module in modules %} 
+                <div class="col d-flex align-items-stretch">
+                    <div class="card h-100 shadow-sm module-card"> 
+                        
+                        {# Header Kartu dengan background abu muda #}
+                        <div class="card-header bg-light module-card-header"> 
+                           <h5 class="mb-0 module-title-themed"> 
+                               <a href="{% url 'learning:module_detail' module.slug %}" class="text-decoration-none themed-link"> 
+                                   {{ module.title }}
+                               </a>
+                           </h5> 
+                        </div>
+
+                        <div class="card-body d-flex flex-column"> 
+                            {% if module.description %}
+                                <p class="card-text text-muted flex-grow-1">{{ module.description|truncatewords:25 }}</p> 
+                            {% else %}
+                                <p class="card-text flex-grow-1 text-muted"><em>(Tidak ada deskripsi)</em></p>
+                            {% endif %}
+                            
+                            {# === PERUBAHAN KELAS TOMBOL === #}
+                            {# Ganti btn-primary menjadi btn-warning #}
+                            <a href="{% url 'learning:module_detail' module.slug %}" 
+                               class="btn btn-warning align-self-start mt-3"> {# <<< Diubah ke btn-warning #}
+                                Pelajari Modul &raquo;
+                            </a> 
+                            {# === AKHIR PERUBAHAN === #}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %} 
+        {% else %} 
+            <div class="col-12 text-center"> 
+                <p>Belum ada modul pembelajaran yang tersedia saat ini.</p>
+            </div>
+        {% endif %} 
+    </div> {# Akhir row #}
+
+</div> {# Akhir container #}
+{% endblock %}

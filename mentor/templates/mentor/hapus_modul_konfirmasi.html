@@ -1,0 +1,40 @@
+{% extends 'base.html' %} {# Mewarisi dari base template Anda #}
+
+{% block title %}Konfirmasi Hapus Modul{% endblock %}
+
+{% block content %}
+<div class="container mt-4 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card border-danger"> {# Border merah untuk penekanan #}
+                <div class="card-header bg-danger text-white">
+                    <h2>Konfirmasi Penghapusan Modul</h2>
+                </div>
+                <div class="card-body">
+                    <p>Apakah Anda yakin ingin menghapus modul berikut?</p>
+                    
+                    {# Tampilkan judul modul yang akan dihapus #}
+                    <h4 class="text-danger">{{ module.title }}</h4> 
+                    
+                    <p class="text-danger fw-bold mt-3">
+                        PERINGATAN: Menghapus modul ini akan menghapus SEMUA Topik, Pelajaran, Kuis, dan data terkait lainnya di dalam modul ini secara permanen! Tindakan ini tidak dapat diurungkan.
+                    </p>
+
+                    {# Form untuk mengirim konfirmasi hapus (metode POST) #}
+                    <form method="post">
+                        {% csrf_token %} {# Token keamanan Django #}
+                        
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                            {# Tombol Batal, kembali ke daftar modul #}
+                            <a href="{% url 'mentor:materi_module_list' %}" class="btn btn-secondary me-md-2">Batal</a>
+                            
+                            {# Tombol Konfirmasi Hapus (Submit form) #}
+                            <button type="submit" class="btn btn-danger">Ya, Hapus Modul Ini</button>
+                        </div>
+                    </form>
+                </div> {# Akhir card-body #}
+            </div> {# Akhir card #}
+        </div> {# Akhir col #}
+    </div> {# Akhir row #}
+</div> {# Akhir container #}
+{% endblock %}

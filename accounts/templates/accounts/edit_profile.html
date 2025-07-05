@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% load static %} 
+
+{% block title %}Edit Profil - {{ user.username }}{% endblock %}
+
+{% block content %}
+<div class="container mt-5 mb-5 edit-profile-page"> 
+    <div class="row justify-content-center">
+        <div class="col-md-9 col-lg-8 col-xl-7"> 
+            <div class="card shadow-sm"> 
+                <div class="card-body p-4 p-md-5"> 
+                    
+                    <h3 class="card-title text-center mb-4">Edit Profil</h3>
+                    <hr>
+
+                    {% if messages %}
+                        {% for message in messages %}
+                        <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    {% if form.non_field_errors %}
+                    <div class="alert alert-danger" role="alert">
+                        {% for error in form.non_field_errors %}<p class="mb-0">{{ error }}</p>{% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <form method="post" enctype="multipart/form-data" novalidate> 
+                        {% csrf_token %}
+
+                        {% for field in form %}
+                            <div class="mb-3">
+                                <label for="{{ field.id_for_label }}" class="form-label fw-bold">{{ field.label }}</label>
+
+                                {% if field.name == 'profile_picture' and user.profile_picture %}
+                                    <p class="text-muted small mb-1">Foto saat ini: 
+                                        <a href="{{ user.profile_picture.url }}" target="_blank">Lihat</a>
+                                    </p>
+                                {% endif %}
+
+                                {{ field }}
+                                {% if field.help_text %}
+                                    <div class="form-text text-muted small mt-1">{{ field.help_text }}</div>
+                                {% endif %}
+                                {% if field.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in field.errors %} <small>{{ error }}</small> {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+
+                        <div class="mt-4 d-flex justify-content-end"> 
+                            <a href="{% url 'accounts:profile' %}" class="btn btn-secondary me-2">Batal</a> 
+                            <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

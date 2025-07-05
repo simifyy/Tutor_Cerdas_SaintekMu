@@ -1,0 +1,25 @@
+services:
+  # Service untuk Database PostgreSQL
+  - type: psql
+    name: tutor-cerdas-db
+    plan: free
+    postgresMajorVersion: 14
+
+  # Service untuk Aplikasi Web Django
+  - type: web
+    name: tutor-cerdas-saintekmu
+    runtime: python
+    plan: free
+    buildCommand: "./build.sh"
+    startCommand: "gunicorn Tutor_Cerdas_SaintekMu.wsgi"
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: tutor-cerdas-db
+          property: externalConnectionString
+      - key: SECRET_KEY
+        generateValue: true
+      - key: PYTHON_VERSION
+        value: 3.11.5
+      - key: DEBUG
+        value: False

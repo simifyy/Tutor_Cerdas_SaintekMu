@@ -1,11 +1,8 @@
-services:
-  # Service untuk Database PostgreSQL
-  - type: psql
-    name: tutor-cerdas-db
+databases:
+  - name: tutor-cerdas-db
     plan: free
-    postgresMajorVersion: 14
 
-  # Service untuk Aplikasi Web Django
+services:
   - type: web
     name: tutor-cerdas-saintekmu
     runtime: python
